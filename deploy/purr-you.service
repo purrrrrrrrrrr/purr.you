@@ -1,0 +1,17 @@
+[Unit]
+Description=purr.you SvelteKit app
+After=network.target
+
+[Service]
+Type=simple
+User=purr
+WorkingDirectory=/opt/purr-you
+ExecStart=/usr/bin/node /opt/purr-you/build/index.js
+Restart=on-failure
+RestartSec=5s
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=HOST=127.0.0.1
+
+[Install]
+WantedBy=multi-user.target

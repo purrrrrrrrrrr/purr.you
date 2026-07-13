@@ -1,0 +1,13 @@
+{
+  "name": "Pian · LED Animator",
+  "short_name": "Pian",
+  "description": "8×8 LED frame animator",
+  "start_url": "/pian",
+  "scope": "/pian",
+  "display": "standalone",
+  "background_color": "#060104",
+  "theme_color": "#060104",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

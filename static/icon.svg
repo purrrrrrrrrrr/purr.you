@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#0a0a0a"/>
+  <!-- isometric floor tile -->
+  <polygon points="256,160 384,224 256,288 128,224" fill="#1a1a2e"/>
+  <polygon points="128,224 256,288 256,352 128,288" fill="#16213e"/>
+  <polygon points="384,224 256,288 256,352 384,288" fill="#0f3460"/>
+  <!-- stickman -->
+  <circle cx="256" cy="180" r="18" fill="#e94560"/>
+  <line x1="256" y1="198" x2="256" y2="240" stroke="#e94560" stroke-width="6"/>
+  <line x1="230" y1="215" x2="282" y2="215" stroke="#e94560" stroke-width="6"/>
+  <line x1="256" y1="240" x2="236" y2="268" stroke="#e94560" stroke-width="6"/>
+  <line x1="256" y1="240" x2="276" y2="268" stroke="#e94560" stroke-width="6"/>
+</svg>

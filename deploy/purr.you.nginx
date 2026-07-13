@@ -1,0 +1,48 @@
+server {
+    listen 80;
+    listen [::]:80;
+    server_name purr.you www.purr.you;
+
+    # redirect all HTTP to HTTPS
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name purr.you www.purr.you;
+
+    ssl_certificate     /etc/letsencrypt/live/purr.you/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/purr.you/privkey.pem;
+    include             /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;
+
+    # static assets — long cache, served directly by nginx
+    location /_app/ {
+        alias /opt/purr-you/build/client/_app/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # HLS segments — cache 1 day so preloader keeps them warm
+    location ~* /wimmy/assets/hls/.*\.m4s$ {
+        proxy_pass         http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header   Host $host;
+        expires 1d;
+        add_header Cache-Control "public, max-age=86400";
+    }
+
+    # everything else proxied to the Node process
+    location / {
+        proxy_pass         http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_set_header   Upgrade           $http_upgrade;
+        proxy_set_header   Connection        "upgrade";
+        proxy_read_timeout 60s;
+    }
+}

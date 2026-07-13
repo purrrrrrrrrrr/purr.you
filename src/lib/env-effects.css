@@ -1,0 +1,24 @@
+/*
+  env-effects — ambient visual effects used across the purr ecosystem UI.
+  Import in a component's <style> block or in app.css.
+  Keyframe names are global so they can be referenced by name from any component.
+*/
+
+/* ── backlight-pulse ────────────────────────────────────────────────────────
+   Calm heartbeat glow that emanates outward from a surface.
+   Usage: animation: backlight-pulse 2.8s ease-in-out infinite;
+   Pair with a --glow-color CSS custom property on the element.
+   ── */
+@keyframes backlight-pulse {
+  /* resting */
+  0%, 100% { box-shadow: 0 0  9px  2px color-mix(in srgb, var(--glow-color, #ff9dd0)  7%, transparent); }
+  /* lub — first beat peak */
+  8%        { box-shadow: 0 0 40px 14px color-mix(in srgb, var(--glow-color, #ff9dd0) 50%, transparent); }
+  /* dip between beats */
+  18%       { box-shadow: 0 0 16px  4px color-mix(in srgb, var(--glow-color, #ff9dd0)  9%, transparent); }
+  /* dub — second beat, slightly softer */
+  28%       { box-shadow: 0 0 29px  9px color-mix(in srgb, var(--glow-color, #ff9dd0) 31%, transparent); }
+  /* back to rest */
+  40%       { box-shadow: 0 0  9px  2px color-mix(in srgb, var(--glow-color, #ff9dd0)  7%, transparent); }
+  /* long silence until next cycle */
+}

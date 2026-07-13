@@ -1,0 +1,12 @@
+{
+  "name": "Bunker",
+  "short_name": "Bunker",
+  "description": "Isometric multiplayer bunker",
+  "start_url": "/bunker",
+  "display": "fullscreen",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
