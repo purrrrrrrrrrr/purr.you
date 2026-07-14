@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import { goto } from "$app/navigation";
-	import Editor from "webblock/Editor.svelte";
+	import Editor from "$lib/webblock/Editor.svelte";
 	import FloatingCard from "$lib/FloatingCard.svelte";
 	import LedDisplay from "$lib/LedDisplay.svelte";
 
