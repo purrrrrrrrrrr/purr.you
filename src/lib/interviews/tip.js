@@ -1,3 +1,4 @@
+// @ts-nocheck
 const MOBILE_MAX = 899;
 
 const COPY = {

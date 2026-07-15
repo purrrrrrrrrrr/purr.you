@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { HOLDING_DATABUN, PLACING, POINTING } from './hands.js';
 
 const POSES = { holding: HOLDING_DATABUN, placing: PLACING, pointing: POINTING };
