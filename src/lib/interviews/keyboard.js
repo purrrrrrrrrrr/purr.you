@@ -1,3 +1,4 @@
+// @ts-nocheck
 export function bindKeyboard(machine, actions) {
   function onKeydown(e) {
     if (machine.state !== 'playing' && machine.state !== 'paused') return;

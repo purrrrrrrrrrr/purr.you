@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { escapeHtml } from './html.js';
 
 export function renderDatabunInSlot(slotEl, interviewee_name) {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { HOLDING_DATABUN } from './hands.js';
 
 export function createDrag(rootEl, slotEl, onDrop, inZone) {

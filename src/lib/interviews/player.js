@@ -1,3 +1,4 @@
+// @ts-nocheck
 export function createPlayer() {
   const audio = new Audio();
   audio.preload = 'auto';

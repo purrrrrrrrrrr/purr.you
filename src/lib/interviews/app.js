@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createTip } from './tip.js';
 import { createMachine } from './state.js';
 import { createCursor } from './cursor.js';

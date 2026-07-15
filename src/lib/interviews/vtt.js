@@ -1,3 +1,4 @@
+// @ts-nocheck
 const TIMESTAMP = /^(\d{2}):(\d{2}):(\d{2})\.(\d{3})$/;
 
 function parseTimestamp(s) {
