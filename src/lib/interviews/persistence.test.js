@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { saveProgress, loadProgress, clearProgress } from './persistence.js';
 

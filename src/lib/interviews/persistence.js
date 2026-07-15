@@ -1,4 +1,3 @@
-// @ts-nocheck
 const KEY = (id) => `interviews:${id}`;
 
 export function saveProgress(databunId, { chapterIndex, currentTime }) {

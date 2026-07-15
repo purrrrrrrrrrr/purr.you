@@ -1,4 +1,3 @@
-// @ts-nocheck
 const TRANSITIONS = {
   boot:      { TIP_READY: 'tipShown' },
   tipShown:  { HOVER_SLOT: 'placing', PLACE: 'placed' },

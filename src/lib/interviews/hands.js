@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Hand SVG pose assets extracted from design files.
 // Color conventions:
 //   currentColor  → #FFE600 (yellow accent, themed by CSS)

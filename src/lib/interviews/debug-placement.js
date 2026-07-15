@@ -1,4 +1,3 @@
-// @ts-nocheck
 export function createDebugPlacement(viewportEl) {
   const el = document.createElement('div');
   el.className = 'debug-placement-area';
