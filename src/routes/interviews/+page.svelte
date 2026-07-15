@@ -1,10 +1,19 @@
+<script>
+	import { onMount } from 'svelte';
+	import { createInterviewsApp } from '$lib/interviews/app.js';
+	import '$lib/interviews/styles.css';
+
+	onMount(() => {
+		const app = createInterviewsApp();
+		return () => app.destroy();
+	});
+</script>
+
 <svelte:head>
 	<title>Interview With a Human</title>
 	<meta name="theme-color" content="#002107">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@100..900&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="/interviews/assets/index-C2LiN539.css">
-	<script type="module" src="/interviews/assets/index-CZ0a_03R.js"></script>
 </svelte:head>
 
 <div id="app">
