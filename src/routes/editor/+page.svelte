@@ -56,6 +56,22 @@
 		return { id: r.id, rot: r.rot ?? 0, faces: r.faces };
 	}
 
+	// A cardinal neighbor is "foreign" for autotile purposes if it's off the map,
+	// empty, or belongs to a different biome group than `group`.
+	function isForeignEdge(tx: number, ty: number, dx: number, dy: number, group: string): boolean {
+		const nx = tx + dx, ny = ty + dy;
+		if (nx < 0 || nx >= level.w || ny < 0 || ny >= level.h) return true;
+		const cell = parseCell(level.floor[ny]?.[nx]);
+		if (!cell) return true;
+		const tile = tiles.find(t => t.id === cell.id);
+		return !tile || tile.group !== group;
+	}
+
+	// The "edge" tile is painted depicting a foreign neighbor to its south (bottom).
+	// Rotating it via the existing rot=0..3 (CW 90° steps, same as getRotatedTex)
+	// repositions which side shows the foreign edge.
+	const EDGE_ROT: Record<'N' | 'E' | 'S' | 'W', number> = { S: 0, W: 1, N: 2, E: 3 };
+
 	// ─── App state ───────────────────────────────────────────────────────────────
 	let tiles    = $state<TileDef[]>([]);
 	let selectedId  = $state<string | null>(null);
@@ -421,6 +437,19 @@
 						ctx.lineTo(sx,        sy + TH/2);
 						ctx.closePath();
 						ctx.stroke();
+					}});
+				} else if (floorTile.type === 'floor' && floorTile.group) {
+					const group = floorTile.group;
+					const centerTile = tiles.find(t => t.group === group && t.variant === 'center') ?? floorTile;
+					const edgeTile   = tiles.find(t => t.group === group && t.variant === 'edge');
+					const tileX = tx, tileY = ty;
+					items.push({ depth, fn: () => {
+						drawIsoFloor(ctx, centerTile, sx, sy, false, 0);
+						if (!edgeTile) return;
+						if (isForeignEdge(tileX, tileY, 0, -1, group)) drawIsoFloor(ctx, edgeTile, sx, sy, false, EDGE_ROT.N);
+						if (isForeignEdge(tileX, tileY, 1, 0, group))  drawIsoFloor(ctx, edgeTile, sx, sy, false, EDGE_ROT.E);
+						if (isForeignEdge(tileX, tileY, 0, 1, group))  drawIsoFloor(ctx, edgeTile, sx, sy, false, EDGE_ROT.S);
+						if (isForeignEdge(tileX, tileY, -1, 0, group)) drawIsoFloor(ctx, edgeTile, sx, sy, false, EDGE_ROT.W);
 					}});
 				} else {
 					const rot = floorCell!.rot;
