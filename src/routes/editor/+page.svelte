@@ -1408,11 +1408,12 @@
 	.type-tabs { display: flex; gap: 2px; }
 
 	.ttab {
-		background: none; border: 1px solid transparent; border-radius: 3px;
+		background: none; border: none; border-bottom: 2px solid transparent;
 		color: #555; font-family: monospace; font-size: 10px; padding: 3px 6px;
 		cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em;
 	}
-	.ttab.active { border-color: #444; color: #ccc; }
+	.ttab:hover { color: #999; }
+	.ttab.active { border-bottom-color: #6ddb6d; color: #ccc; }
 
 	.icon-btn {
 		background: none; border: 1px solid #333; border-radius: 3px;
@@ -1477,11 +1478,12 @@
 
 	.type-mini { display: flex; gap: 2px; }
 	.ttab-mini {
-		background: none; border: 1px solid #222; border-radius: 2px;
+		background: none; border: none; border-bottom: 2px solid transparent;
 		color: #444; font-family: monospace; font-size: 10px; padding: 2px 4px;
 		cursor: pointer; text-transform: uppercase;
 	}
-	.ttab-mini.active { border-color: #555; color: #ccc; }
+	.ttab-mini:hover { color: #999; }
+	.ttab-mini.active { border-bottom-color: #6ddb6d; color: #ccc; }
 
 	.tools {
 		display: flex; gap: 4px; padding: 6px 8px; flex-shrink: 0;
@@ -1614,13 +1616,13 @@
 	.place-tabs { display: flex; gap: 2px; }
 
 	.place-tab {
-		background: none; border: 1px solid #1e1e1e; border-radius: 4px;
+		background: none; border: none; border-bottom: 2px solid transparent;
 		color: #444; font-family: monospace; font-size: 11px;
 		padding: 3px 8px; cursor: pointer;
 		display: flex; align-items: center; gap: 4px;
 	}
-	.place-tab:hover { border-color: #444; color: #999; }
-	.place-tab.active { border-color: #3a7a3a; color: #6ddb6d; background: #0f1f0f; }
+	.place-tab:hover { color: #999; }
+	.place-tab.active { border-bottom-color: #6ddb6d; color: #6ddb6d; }
 
 	.place-icon { font-size: 10px; opacity: 0.7; }
 
