@@ -104,6 +104,7 @@
 	let editScale    = $derived(
 		selectedTile ? Math.max(4, Math.floor(360 / Math.max(selectedTile.w, selectedTile.h))) : 20
 	);
+	let knownGroups = $derived([...new Set(tiles.map(t => t.group).filter((g): g is string => !!g))]);
 
 	// ─── Texture cache ────────────────────────────────────────────────────────────
 	const texCache = new Map<string, OffscreenCanvas>();
@@ -768,6 +769,20 @@
 		debounceSave();
 	}
 
+	function setTileGroup(group: string) {
+		if (!selectedId) return;
+		tiles = tiles.map(t => t.id === selectedId ? { ...t, group: group || undefined } : t);
+		requestRender();
+		debounceSave();
+	}
+
+	function setTileVariant(variant: 'center' | 'edge') {
+		if (!selectedId) return;
+		tiles = tiles.map(t => t.id === selectedId ? { ...t, variant } : t);
+		requestRender();
+		debounceSave();
+	}
+
 	function resizeTile(w: number, h: number) {
 		if (!selectedId) return;
 		tiles = tiles.map(t => t.id === selectedId
@@ -790,6 +805,12 @@
 	}
 
 	// ─── Thumbnail action ─────────────────────────────────────────────────────────
+	function groupColor(group: string): string {
+		let h = 0;
+		for (let i = 0; i < group.length; i++) h = (h * 31 + group.charCodeAt(i)) >>> 0;
+		return `hsl(${h % 360}, 65%, 55%)`;
+	}
+
 	function thumb(node: HTMLCanvasElement, tile: TileDef) {
 		function draw(t: TileDef) {
 			const ctx = node.getContext('2d')!;
@@ -923,6 +944,9 @@
 						style="image-rendering:pixelated; width:32px; height:32px"
 						use:thumb={tile}></canvas>
 					<span class="tile-name-label">{tile.name}</span>
+					{#if tile.group}
+						<span class="group-dot" style="background:{groupColor(tile.group)}" title="{tile.group} ({tile.variant})"></span>
+					{/if}
 				</button>
 			{/each}
 			{#if typedTiles.length === 0}
@@ -960,6 +984,26 @@
 					{/each}
 				</div>
 			</div>
+
+			{#if selectedTile.type === 'floor'}
+				<!-- biome group row -->
+				<div class="meta-row group-row">
+					<input class="name-input" list="group-suggestions"
+						placeholder="group (e.g. grass)"
+						value={selectedTile.group ?? ''}
+						oninput={(e) => setTileGroup((e.target as HTMLInputElement).value)} />
+					<datalist id="group-suggestions">
+						{#each knownGroups as g}<option value={g}></option>{/each}
+					</datalist>
+					<div class="type-mini">
+						{#each ['center','edge'] as v}
+							<button class="ttab-mini" class:active={selectedTile.variant === v}
+								disabled={!selectedTile.group}
+								onclick={() => setTileVariant(v as 'center' | 'edge')}>{v}</button>
+						{/each}
+					</div>
+				</div>
+			{/if}
 
 			<!-- tools -->
 			<div class="tools">
@@ -1122,6 +1166,11 @@
 
 	.tile-name-label { font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+	.group-dot {
+		width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+		margin-left: auto;
+	}
+
 	.empty-lib { padding: 16px 8px; color: #333; text-align: center; line-height: 1.6; }
 
 	.del-btn {
@@ -1139,6 +1188,8 @@
 		display: flex; align-items: center; gap: 6px;
 		padding: 8px; border-bottom: 1px solid #1e1e1e; flex-shrink: 0;
 	}
+
+	.group-row { border-top: 1px solid #1a1a1a; }
 
 	.name-input {
 		flex: 1; background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 3px;
