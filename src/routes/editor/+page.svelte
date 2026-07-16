@@ -209,6 +209,55 @@
 		drawCubeFace(ctx, faces.right, rgb);
 	}
 
+	// Inverts a face's affine mapping: given a screen point known to be inside
+	// the face's polygon, recovers (u,v) in [0,1] via the standard parallelogram
+	// linear-system solve (P - P00 = u*edgeU + v*edgeV).
+	function faceUV(face: CubeFace, px: number, py: number): { u: number; v: number } {
+		const dx = px - face.P00.x, dy = py - face.P00.y;
+		const det = face.edgeU.x * face.edgeV.y - face.edgeU.y * face.edgeV.x;
+		const u = (dx * face.edgeV.y - dy * face.edgeV.x) / det;
+		const v = (face.edgeU.x * dy - face.edgeU.y * dx) / det;
+		return { u: Math.max(0, Math.min(1, u)), v: Math.max(0, Math.min(1, v)) };
+	}
+
+	let cubeDragFace: CubeFace | null = null;
+
+	function pickCubeFaceAt(px: number, py: number): CubeFace | null {
+		const faces = cubeFaces();
+		for (const face of [faces.top, faces.left, faces.right]) {
+			if (pointInPoly(px, py, face.poly)) return face;
+		}
+		return null;
+	}
+
+	function setFromCubeEvent(e: PointerEvent, face: CubeFace) {
+		const rect = cubeCanvas.getBoundingClientRect();
+		const px = (e.clientX - rect.left) * (cubeCanvas.width / rect.width);
+		const py = (e.clientY - rect.top) * (cubeCanvas.height / rect.height);
+		const { u, v } = faceUV(face, px, py);
+		const rgb = hexToRgb(paintColor);
+		const channels = { r: rgb.r, g: rgb.g, b: rgb.b };
+		channels[face.uChannel] = Math.round(u * 255);
+		channels[face.vChannel] = Math.round(v * 255);
+		pickColor(rgbToHex(channels.r, channels.g, channels.b));
+	}
+
+	function onCubeDown(e: PointerEvent) {
+		const rect = cubeCanvas.getBoundingClientRect();
+		const px = (e.clientX - rect.left) * (cubeCanvas.width / rect.width);
+		const py = (e.clientY - rect.top) * (cubeCanvas.height / rect.height);
+		const face = pickCubeFaceAt(px, py);
+		if (!face) return;
+		cubeDragFace = face;
+		(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+		setFromCubeEvent(e, face);
+	}
+	function onCubeMove(e: PointerEvent) {
+		if (!cubeDragFace) return;
+		setFromCubeEvent(e, cubeDragFace);
+	}
+	function onCubeUp() { cubeDragFace = null; }
+
 	// ─── App state ───────────────────────────────────────────────────────────────
 	let tiles    = $state<TileDef[]>([]);
 	let selectedId  = $state<string | null>(null);
@@ -1208,7 +1257,11 @@
 
 			<!-- color cube -->
 			<div class="cube-row">
-				<canvas bind:this={cubeCanvas} class="color-cube"></canvas>
+				<canvas bind:this={cubeCanvas} class="color-cube"
+					onpointerdown={onCubeDown}
+					onpointermove={onCubeMove}
+					onpointerup={onCubeUp}
+					onpointercancel={onCubeUp}></canvas>
 			</div>
 
 			<!-- recent colors -->
@@ -1438,6 +1491,8 @@
 	}
 	.color-cube {
 		display: block;
+		cursor: crosshair;
+		touch-action: none;
 	}
 
 	.palette {
