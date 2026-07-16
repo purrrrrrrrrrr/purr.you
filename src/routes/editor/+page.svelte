@@ -6,14 +6,6 @@
 	const ISO_H = 32;
 	const ISO_BOX = 40;
 
-	// ─── Palette: 32 colors ──────────────────────────────────────────────────────
-	const PALETTE = [
-		'#000000','#1a1a1a','#333333','#555555','#777777','#999999','#bbbbbb','#ffffff',
-		'#ff0000','#ff5500','#ff9900','#ffcc00','#ffff00','#aaff00','#00ff44','#00ff99',
-		'#00ffff','#00aaff','#0055ff','#2200ff','#7700ff','#cc00ff','#ff00cc','#ff0055',
-		'#6b2100','#6b4400','#556b00','#006b33','#00446b','#00006b','#3d006b','#6b003d',
-	];
-
 	const SIZES = [
 		{ label: '8×8',   w: 8,  h: 8  },
 		{ label: '16×16', w: 16, h: 16 },
@@ -262,7 +254,7 @@
 	let tiles    = $state<TileDef[]>([]);
 	let selectedId  = $state<string | null>(null);
 	let activeType  = $state<TileType>('floor');
-	let paintColor    = $state(PALETTE[7]);
+	let paintColor    = $state('#ffffff');
 	let activeTool    = $state<'paint' | 'erase' | 'fill'>('paint');
 	let brushSize     = $state(1);
 	let recentColors  = $state<string[]>([]);
@@ -270,8 +262,8 @@
 	function pickColor(color: string) {
 		paintColor = color;
 		if (activeTool === 'erase') activeTool = 'paint';
-		// push to front, dedupe, cap at 3
-		recentColors = [color, ...recentColors.filter(c => c !== color)].slice(0, 3);
+		// push to front, dedupe, cap at 16
+		recentColors = [color, ...recentColors.filter(c => c !== color)].slice(0, 16);
 	}
 	let activeLayer = $state<'floor' | 'objects'>('floor');
 	let placeMode   = $state<TileType>('floor');
@@ -1123,8 +1115,6 @@
 	// ─── Init ────────────────────────────────────────────────────────────────────
 	function onKeyDown(e: KeyboardEvent) {
 		if (e.target instanceof HTMLInputElement) return;
-		const i = parseInt(e.key) - 1;
-		if (i >= 0 && i < 3 && recentColors[i]) pickColor(recentColors[i]);
 		if (e.key === 'r' || e.key === 'R') rotateSelectedCell();
 	}
 
@@ -1264,31 +1254,16 @@
 					onpointercancel={onCubeUp}></canvas>
 			</div>
 
-			<!-- recent colors -->
+			<!-- color slots -->
 			<div class="recent-row">
-				{#each [0, 1, 2] as i}
+				{#each Array.from({ length: 16 }, (_, i) => i) as i}
 					<button class="recent-slot" class:sel={recentColors[i] === paintColor}
 						style={recentColors[i] ? `background:${recentColors[i]}` : ''}
-						title="slot {i+1} — press {i+1}"
+						title={recentColors[i] ?? 'empty'}
 						disabled={!recentColors[i]}
 						onclick={() => recentColors[i] && pickColor(recentColors[i])}>
-						<span class="recent-key">{i + 1}</span>
 					</button>
 				{/each}
-			</div>
-
-			<!-- palette -->
-			<div class="palette">
-				{#each PALETTE as color}
-					<button class="pswatch" class:sel={paintColor === color}
-						style="background:{color}"
-						aria-label={color}
-						onclick={() => pickColor(color)}>
-					</button>
-				{/each}
-				<button class="pswatch eraser" class:sel={activeTool === 'erase'}
-					title="erase"
-					onclick={() => activeTool = 'erase'}>∅</button>
 			</div>
 		{:else}
 			<div class="placeholder">select a tile from the library<br/>or press + to create one</div>
@@ -1495,42 +1470,19 @@
 		touch-action: none;
 	}
 
-	.palette {
-		display: flex; flex-wrap: wrap; gap: 3px;
+	.recent-row {
+		display: flex; flex-wrap: wrap; gap: 4px;
 		padding: 8px; border-top: 1px solid #1e1e1e; flex-shrink: 0;
 	}
 
-	.pswatch {
-		width: 18px; height: 18px; border-radius: 2px;
-		border: 2px solid transparent; cursor: pointer; padding: 0; flex-shrink: 0;
-	}
-	.pswatch.sel { border-color: #fff; }
-	.recent-row {
-		display: flex; gap: 6px; padding: 6px 8px 2px;
-		border-top: 1px solid #1e1e1e;
-	}
-
 	.recent-slot {
-		width: 36px; height: 36px; border-radius: 4px;
+		width: 22px; height: 22px; border-radius: 3px;
 		border: 2px solid #2a2a2a; cursor: pointer; padding: 0;
-		background: #111; position: relative;
-		display: flex; align-items: flex-end; justify-content: flex-end;
+		background: #111;
 	}
 	.recent-slot:disabled { opacity: 0.3; cursor: default; }
 	.recent-slot.sel { border-color: #fff; }
 	.recent-slot:not(:disabled):hover { border-color: #666; }
-
-	.recent-key {
-		font-size: 9px; font-family: monospace; color: rgba(255,255,255,0.5);
-		line-height: 1; padding: 1px 2px;
-		text-shadow: 0 0 3px #000;
-	}
-
-	.pswatch.eraser {
-		background: #111; color: #555; font-size: 11px;
-		border-color: #333; display: flex; align-items: center; justify-content: center;
-	}
-	.pswatch.eraser.sel { border-color: #e74c3c; color: #e74c3c; }
 
 	.placeholder {
 		flex: 1; display: flex; align-items: center; justify-content: center;
