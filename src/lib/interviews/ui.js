@@ -1,11 +1,15 @@
-// @ts-nocheck
 import { escapeHtml } from './html.js';
 
+/**
+ * @param {HTMLElement} slotEl
+ * @param {string} interviewee_name
+ */
 export function renderDatabunInSlot(slotEl, interviewee_name) {
   slotEl.classList.add('occupied');
-  slotEl.querySelector('.slot-label').textContent = interviewee_name;
+  /** @type {HTMLElement} */ (slotEl.querySelector('.slot-label')).textContent = interviewee_name;
 }
 
+/** @param {HTMLElement} viewportEl */
 export function renderPlaybackViewport(viewportEl) {
   const chapterTitleEl = document.createElement('div');
   chapterTitleEl.className = 'chapter-title';
@@ -20,6 +24,10 @@ export function renderPlaybackViewport(viewportEl) {
   viewportEl.append(chapterTitleEl, subsEl);
 }
 
+/**
+ * @param {HTMLElement} rightEl
+ * @param {{ chapters: { title: string }[] }} databun
+ */
 export function renderTransport(rightEl, databun) {
   rightEl.innerHTML = `
     <div class="timeline" id="timeline">
@@ -45,6 +53,7 @@ export function renderTransport(rightEl, databun) {
   `;
 }
 
+/** @param {number} seconds */
 export function fmtTime(seconds) {
   if (!isFinite(seconds)) return '00:00';
   const total = Math.max(0, Math.floor(seconds));

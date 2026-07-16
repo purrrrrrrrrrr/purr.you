@@ -1,20 +1,25 @@
-// @ts-nocheck
 import { HOLDING_DATABUN } from './hands.js';
 
+/**
+ * @param {HTMLElement} rootEl
+ * @param {HTMLElement} slotEl
+ * @param {() => void} onDrop
+ * @param {((e: PointerEvent) => boolean) | undefined} [inZone]
+ */
 export function createDrag(rootEl, slotEl, onDrop, inZone) {
   const el = document.createElement('div');
   el.className = 'databun-drag';
   el.innerHTML = HOLDING_DATABUN;
   rootEl.appendChild(el);
 
-  const v = rootEl.querySelector('.viewport').getBoundingClientRect();
+  const v = /** @type {HTMLElement} */ (rootEl.querySelector('.viewport')).getBoundingClientRect();
   el.style.left = `${v.left + v.width / 2 - 90}px`;
   el.style.top  = `${v.top + v.height / 2 - 70}px`;
 
   let dragging = false;
   let offsetX = 0, offsetY = 0;
 
-  el.addEventListener('pointerdown', (e) => {
+  el.addEventListener('pointerdown', (/** @type {PointerEvent} */ e) => {
     dragging = true;
     el.setPointerCapture(e.pointerId);
     el.classList.add('dragging');
@@ -23,13 +28,13 @@ export function createDrag(rootEl, slotEl, onDrop, inZone) {
     offsetY = e.clientY - r.top;
   });
 
-  el.addEventListener('pointermove', (e) => {
+  el.addEventListener('pointermove', (/** @type {PointerEvent} */ e) => {
     if (!dragging) return;
     el.style.left = `${e.clientX - offsetX}px`;
     el.style.top  = `${e.clientY - offsetY}px`;
   });
 
-  el.addEventListener('pointerup', (e) => {
+  el.addEventListener('pointerup', (/** @type {PointerEvent} */ e) => {
     if (!dragging) return;
     dragging = false;
     el.classList.remove('dragging');

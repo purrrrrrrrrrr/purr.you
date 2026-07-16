@@ -1,4 +1,3 @@
-// @ts-nocheck
 const MOBILE_MAX = 899;
 
 const COPY = {
@@ -11,14 +10,17 @@ function variant() {
   return window.innerWidth <= MOBILE_MAX ? 'mobile' : 'desktop';
 }
 
+/** @param {HTMLElement} el */
 export function createTip(el) {
-  const textEl = el.querySelector('.tip-wrapper');
+  const textEl = /** @type {HTMLElement} */ (el.querySelector('.tip-wrapper'));
   let idlePromise = Promise.resolve();
 
+  /** @param {keyof typeof COPY} key */
   function setText(key) {
     textEl.textContent = COPY[key][variant()];
   }
 
+  /** @param {() => void} setContent */
   function transition(setContent) {
     if (!el.classList.contains('shown')) {
       setContent();
@@ -37,17 +39,23 @@ export function createTip(el) {
   }
 
   return {
+    /** @param {keyof typeof COPY} key */
     show(key) {
       setText(key);
       el.classList.add('active');
       requestAnimationFrame(() => el.classList.add('shown'));
     },
+    /**
+     * @param {string} text
+     * @param {(() => void) | undefined} [onShown]
+     */
     showText(text, onShown) {
       textEl.textContent = text;
       el.classList.add('active');
       requestAnimationFrame(() => {
         el.classList.add('shown');
         if (onShown) {
+          /** @param {TransitionEvent} e */
           const handler = (e) => {
             if (e.propertyName !== 'clip-path') return;
             el.removeEventListener('transitionend', handler);
@@ -57,6 +65,7 @@ export function createTip(el) {
         }
       });
     },
+    /** @param {keyof typeof COPY} key */
     setKey(key) { transition(() => setText(key)); },
     hide() {
       if (!el.classList.contains('shown')) return;

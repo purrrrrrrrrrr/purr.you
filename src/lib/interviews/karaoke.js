@@ -1,11 +1,18 @@
-// @ts-nocheck
 import { escapeHtml } from './html.js';
 
+/**
+ * @param {HTMLElement} containerEl
+ * @param {() => number} getTime
+ */
 export function createKaraoke(containerEl, getTime) {
+  /** @type {{ start: number, end: number, text: string }[]} */
   let cues = [];
+  /** @type {HTMLElement[]} */
   let cueEls = [];
+  /** @type {HTMLElement[]} */
   let fills = [];
   let activeCueIdx = -1;
+  /** @type {number | null} */
   let rafId = null;
 
   function tick() {
@@ -13,6 +20,7 @@ export function createKaraoke(containerEl, getTime) {
     rafId = requestAnimationFrame(tick);
   }
 
+  /** @param {{ start: number, end: number, text: string }[]} cuesNext */
   function render(cuesNext) {
     cues = cuesNext;
     activeCueIdx = -1;
@@ -22,13 +30,14 @@ export function createKaraoke(containerEl, getTime) {
         <span class="cue-fill" style="clip-path: inset(0 100% 0 0)">${escapeHtml(c.text)}</span>
       </div>
     `).join('');
-    cueEls = Array.from(containerEl.querySelectorAll('.cue'));
-    fills = Array.from(containerEl.querySelectorAll('.cue-fill'));
+    cueEls = /** @type {HTMLElement[]} */ (Array.from(containerEl.querySelectorAll('.cue')));
+    fills = /** @type {HTMLElement[]} */ (Array.from(containerEl.querySelectorAll('.cue-fill')));
     containerEl.style.transform = 'translateY(0)';
     if (rafId) cancelAnimationFrame(rafId);
     rafId = requestAnimationFrame(tick);
   }
 
+  /** @param {number} currentTime */
   function update(currentTime) {
     const idx = cues.findIndex(c => currentTime >= c.start && currentTime < c.end);
     if (idx === -1) return;

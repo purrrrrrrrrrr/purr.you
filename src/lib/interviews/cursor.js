@@ -1,8 +1,8 @@
-// @ts-nocheck
 import { HOLDING_DATABUN, PLACING, POINTING } from './hands.js';
 
 const POSES = { holding: HOLDING_DATABUN, placing: PLACING, pointing: POINTING };
 
+/** @param {HTMLElement} rootEl */
 export function createCursor(rootEl) {
   const el = document.createElement('div');
   el.className = 'hand-cursor';
@@ -14,6 +14,7 @@ export function createCursor(rootEl) {
   let frozen = false;
   let lastX = 0, lastY = 0;
 
+  /** @param {PointerEvent} e */
   function onMove(e) {
     lastX = e.clientX;
     lastY = e.clientY;
@@ -53,6 +54,7 @@ export function createCursor(rootEl) {
     visible = false;
   }
 
+  /** @param {keyof typeof POSES} name */
   function setPose(name) {
     el.innerHTML = POSES[name];
     el.dataset.pose = name;
