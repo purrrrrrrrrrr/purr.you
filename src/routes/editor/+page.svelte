@@ -834,6 +834,22 @@
 		} catch {}
 	}
 
+	function scaffoldDefaults() {
+		const savedType = activeType;
+
+		activeType = 'floor';
+		for (const group of ['grass', 'forest', 'lake'] as const) {
+			newTile({ name: `${group} center`, group, variant: 'center' });
+			newTile({ name: `${group} edge`, group, variant: 'edge' });
+		}
+
+		activeType = 'wall';
+		newTile({ name: 'mountain' });
+
+		activeType = savedType;
+		selectedId = tiles[0]?.id ?? null;
+	}
+
 	// ─── Export / import ──────────────────────────────────────────────────────────
 	function exportJSON() {
 		const blob = new Blob([JSON.stringify({ tiles, level }, null, 2)], { type: 'application/json' });
@@ -870,6 +886,7 @@
 
 	onMount(() => {
 		load();
+		if (tiles.length === 0) scaffoldDefaults();
 		requestRender();
 		window.addEventListener('keydown', onKeyDown);
 		const ro = new ResizeObserver(requestRender);
