@@ -59,10 +59,10 @@ export function createInterviewsApp() {
       cursor.setPose('pointing');
       cursor.unfreeze();
       renderDatabunInSlot(slotEl, currentDatabun.interviewee_name);
-      document.getElementById('load-btn')?.classList.add('pulsing');
+      /** @type {HTMLElement} */ (document.getElementById('load-btn')).classList.add('pulsing');
     }
     if (state === 'loading') {
-      document.getElementById('load-btn')?.classList.remove('pulsing');
+      /** @type {HTMLElement} */ (document.getElementById('load-btn')).classList.remove('pulsing');
       cursor.detach();
       tip.hide();
     }
@@ -108,9 +108,9 @@ export function createInterviewsApp() {
           ctEl.addEventListener('transitionend', () => {
             const subsEl = /** @type {HTMLElement} */ (document.getElementById('subs'));
             subsEl.classList.add('visible');
-            document.querySelector('.tip-wrapper')?.classList.add('line-shown');
+            /** @type {HTMLElement} */ (document.querySelector('.tip-wrapper')).classList.add('line-shown');
             subsEl.addEventListener('transitionend', () => {
-              document.getElementById('console-right')?.classList.add('active');
+              /** @type {HTMLElement} */ (document.getElementById('console-right')).classList.add('active');
             }, { once: true });
           }, { once: true });
         });
@@ -182,7 +182,7 @@ export function createInterviewsApp() {
       next:   () => /** @type {HTMLElement} */ (document.getElementById('t-next')).click()
     });
   }
-  document.getElementById('load-btn')?.addEventListener('click', onLoadClick);
+  /** @type {HTMLElement} */ (document.getElementById('load-btn')).addEventListener('click', onLoadClick);
 
   /** @type {ReturnType<typeof setTimeout> | null} */
   let tipReadyTimer = null;
