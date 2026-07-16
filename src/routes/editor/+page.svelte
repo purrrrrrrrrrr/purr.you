@@ -266,6 +266,34 @@
 	];
 	let colorGrid = $state<string[]>([...DEFAULT_COLOR_GRID]);
 
+	let editingSlot = $state<number | null>(null);
+	let popupPos = $state<{ x: number; y: number }>({ x: 0, y: 0 });
+	const POPUP_W = 220, POPUP_H = 220;
+
+	function openSwatchEditor(i: number, e: MouseEvent) {
+		editingSlot = editingSlot === i ? null : i;
+		if (editingSlot === null) return;
+		pickColor(colorGrid[i]);
+		const x = Math.max(8, Math.min(e.clientX, window.innerWidth - POPUP_W - 8));
+		const y = Math.max(8, Math.min(e.clientY, window.innerHeight - POPUP_H - 8));
+		popupPos = { x, y };
+	}
+
+	function closeSwatchEditor() {
+		editingSlot = null;
+	}
+
+	function onHexInput(value: string) {
+		if (/^#[0-9a-fA-F]{6}$/.test(value)) pickColor(value);
+	}
+
+	$effect(() => {
+		if (editingSlot !== null) {
+			colorGrid[editingSlot] = paintColor;
+			debounceSave();
+		}
+	});
+
 	function pickColor(color: string) {
 		paintColor = color;
 		if (activeTool === 'erase') activeTool = 'paint';
@@ -1138,6 +1166,7 @@
 
 	// ─── Init ────────────────────────────────────────────────────────────────────
 	function onKeyDown(e: KeyboardEvent) {
+		if (e.key === 'Escape' && editingSlot !== null) { closeSwatchEditor(); return; }
 		if (e.target instanceof HTMLInputElement) return;
 		if (e.key === 'r' || e.key === 'R') rotateSelectedCell();
 	}
@@ -1275,25 +1304,31 @@
 					onmouseleave={onEditUp}></canvas>
 			</div>
 
-			<!-- color cube -->
-			<div class="cube-row">
-				<canvas bind:this={cubeCanvas} class="color-cube"
-					onpointerdown={onCubeDown}
-					onpointermove={onCubeMove}
-					onpointerup={onCubeUp}
-					onpointercancel={onCubeUp}></canvas>
-			</div>
-
 			<!-- color grid -->
 			<div class="color-grid">
 				{#each colorGrid as color, i (i)}
 					<button class="grid-swatch" class:sel={paintColor === color}
 						style="background:{color}"
 						title={color}
-						onclick={() => pickColor(color)}>
+						onclick={() => pickColor(color)}
+						ondblclick={(e) => openSwatchEditor(i, e)}>
 					</button>
 				{/each}
 			</div>
+
+			{#if editingSlot !== null}
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
+				<div class="popup-backdrop" onclick={closeSwatchEditor}></div>
+				<div class="swatch-popup" style="left:{popupPos.x}px; top:{popupPos.y}px;">
+					<canvas bind:this={cubeCanvas} class="color-cube"
+						onpointerdown={onCubeDown}
+						onpointermove={onCubeMove}
+						onpointerup={onCubeUp}
+						onpointercancel={onCubeUp}></canvas>
+					<input class="hex-input" value={paintColor}
+						oninput={(e) => onHexInput((e.target as HTMLInputElement).value)} />
+				</div>
+			{/if}
 		{:else}
 			<div class="placeholder">select a tile from the library<br/>or press + to create one</div>
 		{/if}
@@ -1489,14 +1524,25 @@
 		display: block;
 	}
 
-	.cube-row {
-		display: flex; justify-content: center; padding: 8px;
-		border-top: 1px solid #1e1e1e; flex-shrink: 0;
-	}
 	.color-cube {
 		display: block;
 		cursor: crosshair;
 		touch-action: none;
+	}
+
+	.popup-backdrop {
+		position: fixed; inset: 0; background: transparent; border: none; padding: 0;
+		z-index: 40; cursor: default;
+	}
+	.swatch-popup {
+		position: fixed; z-index: 41; background: #161616; border: 1px solid #333;
+		border-radius: 6px; padding: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+		display: flex; flex-direction: column; align-items: center; gap: 8px;
+	}
+	.hex-input {
+		width: 100px; background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 3px;
+		color: #eee; font-family: monospace; font-size: 12px; padding: 4px 6px;
+		text-align: center; outline: none;
 	}
 
 	.wall-preview-row {
