@@ -31,6 +31,8 @@
 		h: number;
 		pixels: string[];
 		type: TileType;
+		group?: string;              // biome family id, e.g. "grass" | "forest" | "lake" — floor tiles only
+		variant?: 'center' | 'edge'; // role within the group — floor tiles only
 	}
 
 	interface Cell {
@@ -723,17 +725,20 @@
 	function onLevelCtx(e: MouseEvent) { e.preventDefault(); }
 
 	// ─── Tile management ──────────────────────────────────────────────────────────
-	function newTile() {
+	function newTile(opts?: { name?: string; group?: string; variant?: 'center' | 'edge' }) {
 		const w = 16, h = 16;
 		const tile: TileDef = {
 			id: crypto.randomUUID(),
-			name: `${activeType} ${typedTiles.length + 1}`,
+			name: opts?.name ?? `${activeType} ${typedTiles.length + 1}`,
 			w, h, type: activeType,
 			pixels: new Array(w * h).fill(''),
+			group: opts?.group,
+			variant: opts?.variant,
 		};
 		tiles = [...tiles, tile];
 		selectedId = tile.id;
 		requestRender();
+		return tile;
 	}
 
 	function deleteTile() {
@@ -890,7 +895,7 @@
 						onclick={() => activeType = t as TileType}>{t}</button>
 				{/each}
 			</div>
-			<button class="icon-btn" onclick={newTile} title="new tile">+</button>
+			<button class="icon-btn" onclick={() => newTile()} title="new tile">+</button>
 		</div>
 
 		<div class="tile-list">
