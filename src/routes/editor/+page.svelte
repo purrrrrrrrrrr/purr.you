@@ -72,6 +72,143 @@
 	// repositions which side shows the foreign edge.
 	const EDGE_ROT: Record<'N' | 'E' | 'S' | 'W', number> = { S: 0, W: 1, N: 2, E: 3 };
 
+	function hexToRgb(hex: string): { r: number; g: number; b: number } {
+		const n = hex.replace('#', '');
+		return {
+			r: parseInt(n.slice(0, 2), 16),
+			g: parseInt(n.slice(2, 4), 16),
+			b: parseInt(n.slice(4, 6), 16),
+		};
+	}
+
+	function rgbToHex(r: number, g: number, b: number): string {
+		const toHex = (v: number) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0');
+		return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+	}
+
+	// ─── Color cube geometry ──────────────────────────────────────────────────
+	// Same 3-face iso-cube shape as drawIsoFloor's `asWall` branch (top diamond +
+	// left/right parallelograms), scaled down for a compact picker.
+	const CUBE_TW = 90, CUBE_TH = 45, CUBE_BH = 56;
+	const CUBE_OX = 10, CUBE_OY = CUBE_BH + 10; // sx, sy — top-left origin within the picker canvas
+	const CUBE_W = CUBE_TW + CUBE_OX * 2;
+	const CUBE_H = CUBE_BH + CUBE_TH + CUBE_OY - CUBE_BH + CUBE_OX; // canvas height, generous padding
+
+	type Vec = { x: number; y: number };
+	interface CubeFace { P00: Vec; edgeU: Vec; edgeV: Vec; poly: [number, number][]; uChannel: 'r' | 'g'; vChannel: 'g' | 'b'; fixedChannel: 'r' | 'g' | 'b'; }
+
+	function cubeFaces(): { top: CubeFace; left: CubeFace; right: CubeFace } {
+		const sx = CUBE_OX, sy = CUBE_OY, TW = CUBE_TW, TH = CUBE_TH, BH = CUBE_BH;
+
+		const topP = { x: sx + TW / 2, y: sy - BH };
+		const rightP = { x: sx + TW, y: sy + TH / 2 - BH };
+		const leftP = { x: sx, y: sy + TH / 2 - BH };
+		const bottomP = { x: sx + TW / 2, y: sy + TH - BH };
+
+		const top: CubeFace = {
+			P00: topP,
+			edgeU: { x: rightP.x - topP.x, y: rightP.y - topP.y },
+			edgeV: { x: leftP.x - topP.x, y: leftP.y - topP.y },
+			poly: [[topP.x, topP.y], [rightP.x, rightP.y], [bottomP.x, bottomP.y], [leftP.x, leftP.y]],
+			uChannel: 'r', vChannel: 'g', fixedChannel: 'b',
+		};
+
+		const leftTopLeft = leftP;
+		const leftTopRight = bottomP;
+		const leftBottomLeft = { x: sx, y: sy + TH / 2 };
+		const leftBottomRight = { x: sx + TW / 2, y: sy + TH };
+		const left: CubeFace = {
+			P00: leftTopLeft,
+			edgeU: { x: leftTopRight.x - leftTopLeft.x, y: leftTopRight.y - leftTopLeft.y },
+			edgeV: { x: leftBottomLeft.x - leftTopLeft.x, y: leftBottomLeft.y - leftTopLeft.y },
+			poly: [[leftTopLeft.x, leftTopLeft.y], [leftTopRight.x, leftTopRight.y], [leftBottomRight.x, leftBottomRight.y], [leftBottomLeft.x, leftBottomLeft.y]],
+			uChannel: 'g', vChannel: 'b', fixedChannel: 'r',
+		};
+
+		const rightTopLeft = bottomP;
+		const rightTopRight = rightP;
+		const rightBottomLeft = { x: sx + TW / 2, y: sy + TH };
+		const right: CubeFace = {
+			P00: rightTopLeft,
+			edgeU: { x: rightTopRight.x - rightTopLeft.x, y: rightTopRight.y - rightTopLeft.y },
+			edgeV: { x: rightBottomLeft.x - rightTopLeft.x, y: rightBottomLeft.y - rightTopLeft.y },
+			poly: [[rightTopLeft.x, rightTopLeft.y], [rightTopRight.x, rightTopRight.y], [{ x: sx + TW, y: sy + TH / 2 }.x, { x: sx + TW, y: sy + TH / 2 }.y], [rightBottomLeft.x, rightBottomLeft.y]],
+			uChannel: 'r', vChannel: 'b', fixedChannel: 'g',
+		};
+
+		return { top, left, right };
+	}
+
+	function facePoint(face: CubeFace, u: number, v: number): Vec {
+		return {
+			x: face.P00.x + u * face.edgeU.x + v * face.edgeV.x,
+			y: face.P00.y + u * face.edgeU.y + v * face.edgeV.y,
+		};
+	}
+
+	const CUBE_TEX_N = 24;
+
+	function buildFaceTexture(face: CubeFace, rgb: { r: number; g: number; b: number }): OffscreenCanvas {
+		const tex = new OffscreenCanvas(CUBE_TEX_N, CUBE_TEX_N);
+		const tctx = tex.getContext('2d')!;
+		const img = tctx.createImageData(CUBE_TEX_N, CUBE_TEX_N);
+		for (let j = 0; j < CUBE_TEX_N; j++) {
+			for (let i = 0; i < CUBE_TEX_N; i++) {
+				const u = i / (CUBE_TEX_N - 1), v = j / (CUBE_TEX_N - 1);
+				const channels = { r: rgb.r, g: rgb.g, b: rgb.b };
+				channels[face.uChannel] = Math.round(u * 255);
+				channels[face.vChannel] = Math.round(v * 255);
+				const idx = (j * CUBE_TEX_N + i) * 4;
+				img.data[idx] = channels.r; img.data[idx + 1] = channels.g; img.data[idx + 2] = channels.b; img.data[idx + 3] = 255;
+			}
+		}
+		tctx.putImageData(img, 0, 0);
+		return tex;
+	}
+
+	function drawCubeFace(ctx: CanvasRenderingContext2D, face: CubeFace, rgb: { r: number; g: number; b: number }) {
+		const tex = buildFaceTexture(face, rgb);
+		ctx.save();
+		ctx.beginPath();
+		const [p0, p1, p2, p3] = face.poly;
+		ctx.moveTo(p0[0], p0[1]); ctx.lineTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); ctx.lineTo(p3[0], p3[1]);
+		ctx.closePath(); ctx.clip();
+		ctx.transform(
+			face.edgeU.x / (CUBE_TEX_N - 1), face.edgeU.y / (CUBE_TEX_N - 1),
+			face.edgeV.x / (CUBE_TEX_N - 1), face.edgeV.y / (CUBE_TEX_N - 1),
+			face.P00.x, face.P00.y
+		);
+		ctx.imageSmoothingEnabled = false;
+		ctx.drawImage(tex, 0, 0);
+		ctx.restore();
+
+		const channels = { r: rgb.r, g: rgb.g, b: rgb.b };
+		const u = channels[face.uChannel] / 255, v = channels[face.vChannel] / 255;
+		const m = facePoint(face, u, v);
+		ctx.save();
+		ctx.beginPath();
+		ctx.arc(m.x, m.y, 4, 0, Math.PI * 2);
+		ctx.fillStyle = '#fff';
+		ctx.fill();
+		ctx.lineWidth = 1.5;
+		ctx.strokeStyle = '#000';
+		ctx.stroke();
+		ctx.restore();
+	}
+
+	function drawColorCube() {
+		if (!cubeCanvas) return;
+		cubeCanvas.width = CUBE_W;
+		cubeCanvas.height = CUBE_H;
+		const ctx = cubeCanvas.getContext('2d')!;
+		ctx.clearRect(0, 0, CUBE_W, CUBE_H);
+		const rgb = hexToRgb(paintColor);
+		const faces = cubeFaces();
+		drawCubeFace(ctx, faces.top, rgb);
+		drawCubeFace(ctx, faces.left, rgb);
+		drawCubeFace(ctx, faces.right, rgb);
+	}
+
 	// ─── App state ───────────────────────────────────────────────────────────────
 	let tiles    = $state<TileDef[]>([]);
 	let selectedId  = $state<string | null>(null);
@@ -113,6 +250,7 @@
 	// ─── Canvas elements ─────────────────────────────────────────────────────────
 	let editCanvas  = $state<HTMLCanvasElement>(null!);
 	let levelCanvas = $state<HTMLCanvasElement>(null!);
+	let cubeCanvas  = $state<HTMLCanvasElement>(null!);
 
 	// ─── Derived ─────────────────────────────────────────────────────────────────
 	let selectedTile = $derived(tiles.find(t => t.id === selectedId) ?? null);
@@ -200,6 +338,11 @@
 		void selectedTile?.pixels.join('');
 		void editScale;
 		redrawEdit();
+	});
+
+	$effect(() => {
+		void paintColor;
+		drawColorCube();
 	});
 
 	// ─── Edit canvas interaction ──────────────────────────────────────────────────
@@ -1063,6 +1206,11 @@
 					onmouseleave={onEditUp}></canvas>
 			</div>
 
+			<!-- color cube -->
+			<div class="cube-row">
+				<canvas bind:this={cubeCanvas} class="color-cube"></canvas>
+			</div>
+
 			<!-- recent colors -->
 			<div class="recent-row">
 				{#each [0, 1, 2] as i}
@@ -1281,6 +1429,14 @@
 	.edit-canvas {
 		cursor: crosshair;
 		image-rendering: pixelated;
+		display: block;
+	}
+
+	.cube-row {
+		display: flex; justify-content: center; padding: 8px;
+		border-top: 1px solid #1e1e1e; flex-shrink: 0;
+	}
+	.color-cube {
 		display: block;
 	}
 
