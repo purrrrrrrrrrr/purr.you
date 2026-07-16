@@ -64,7 +64,7 @@
 		const cell = parseCell(level.floor[ny]?.[nx]);
 		if (!cell) return true;
 		const tile = tiles.find(t => t.id === cell.id);
-		return !tile || tile.group !== group;
+		return !tile || tile.type !== 'floor' || tile.group !== group;
 	}
 
 	// The "edge" tile is painted depicting a foreign neighbor to its south (bottom).
@@ -440,8 +440,8 @@
 					}});
 				} else if (floorTile.type === 'floor' && floorTile.group) {
 					const group = floorTile.group;
-					const centerTile = tiles.find(t => t.group === group && t.variant === 'center') ?? floorTile;
-					const edgeTile   = tiles.find(t => t.group === group && t.variant === 'edge');
+					const centerTile = tiles.find(t => t.type === 'floor' && t.group === group && t.variant === 'center') ?? floorTile;
+					const edgeTile   = tiles.find(t => t.type === 'floor' && t.group === group && t.variant === 'edge');
 					const tileX = tx, tileY = ty;
 					items.push({ depth, fn: () => {
 						drawIsoFloor(ctx, centerTile, sx, sy, false, 0);
@@ -793,7 +793,9 @@
 
 	function setTileType(type: TileType) {
 		if (!selectedId) return;
-		tiles = tiles.map(t => t.id === selectedId ? { ...t, type } : t);
+		tiles = tiles.map(t => t.id === selectedId
+			? { ...t, type, group: type === 'floor' ? t.group : undefined, variant: type === 'floor' ? t.variant : undefined }
+			: t);
 		requestRender();
 		debounceSave();
 	}
