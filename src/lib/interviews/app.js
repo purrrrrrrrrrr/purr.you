@@ -10,7 +10,7 @@ import { createKaraoke } from './karaoke.js';
 import { parseVTT } from './vtt.js';
 import { seekBy, prevChapter, nextChapter, isLastChapter } from './transport.js';
 import { bindKeyboard } from './keyboard.js';
-import { saveProgress } from './persistence.js';
+import { saveProgress, loadProgress } from './persistence.js';
 import { createDebugPlacement } from './debug-placement.js';
 
 const MOBILE_MAX = 899;
@@ -162,7 +162,8 @@ export function createInterviewsApp() {
     const consoleRight = document.getElementById('console-right');
     renderTransport(consoleRight, currentDatabun);
     bindTransport();
-    await loadChapter(0);
+    const saved = loadProgress(currentDatabun.id);
+    await loadChapter(saved?.chapterIndex ?? 0, saved?.currentTime ?? 0);
     bindPlayback();
     unbindKeyboard = bindKeyboard(machine, {
       toggle: () => document.getElementById('t-play').click(),
