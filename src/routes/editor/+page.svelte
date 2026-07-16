@@ -257,13 +257,18 @@
 	let paintColor    = $state('#ffffff');
 	let activeTool    = $state<'paint' | 'erase' | 'fill'>('paint');
 	let brushSize     = $state(1);
-	let recentColors  = $state<string[]>([]);
+
+	const DEFAULT_COLOR_GRID = [
+		'#000000','#1a1a1a','#333333','#555555','#777777','#999999','#bbbbbb','#ffffff','#ff0000',
+		'#ff5500','#ff9900','#ffcc00','#ffff00','#aaff00','#00ff44','#00ff99','#00ffff','#00aaff',
+		'#0055ff','#2200ff','#7700ff','#cc00ff','#ff00cc','#ff0055','#6b2100','#6b4400','#556b00',
+		'#006b33','#00446b','#00006b','#3d006b','#6b003d','#804000','#408000','#004080','#800040',
+	];
+	let colorGrid = $state<string[]>([...DEFAULT_COLOR_GRID]);
 
 	function pickColor(color: string) {
 		paintColor = color;
 		if (activeTool === 'erase') activeTool = 'paint';
-		// push to front, dedupe, cap at 16
-		recentColors = [color, ...recentColors.filter(c => c !== color)].slice(0, 16);
 	}
 	let activeLayer = $state<'floor' | 'objects'>('floor');
 	let placeMode   = $state<TileType>('floor');
@@ -1064,6 +1069,7 @@
 			try {
 				localStorage.setItem('editor-tiles', JSON.stringify(tiles));
 				localStorage.setItem('editor-level', JSON.stringify(level));
+				localStorage.setItem('editor-colorgrid', JSON.stringify(colorGrid));
 			} catch {}
 		}, 600) as unknown as number;
 	}
@@ -1072,6 +1078,7 @@
 		try {
 			const t = localStorage.getItem('editor-tiles');
 			const l = localStorage.getItem('editor-level');
+			const cg = localStorage.getItem('editor-colorgrid');
 			if (t) tiles = JSON.parse(t);
 			if (l) {
 				const raw = JSON.parse(l) as Level;
@@ -1082,6 +1089,7 @@
 					objects: raw.objects.map(row => row.map(c => parseCell(c))),
 				};
 			}
+			if (cg) colorGrid = JSON.parse(cg);
 			selectedId = tiles[0]?.id ?? null;
 		} catch {}
 	}
@@ -1276,14 +1284,13 @@
 					onpointercancel={onCubeUp}></canvas>
 			</div>
 
-			<!-- color slots -->
-			<div class="recent-row">
-				{#each Array.from({ length: 16 }, (_, i) => i) as i}
-					<button class="recent-slot" class:sel={recentColors[i] === paintColor}
-						style={recentColors[i] ? `background:${recentColors[i]}` : ''}
-						title={recentColors[i] ?? 'empty'}
-						disabled={!recentColors[i]}
-						onclick={() => recentColors[i] && pickColor(recentColors[i])}>
+			<!-- color grid -->
+			<div class="color-grid">
+				{#each colorGrid as color, i (i)}
+					<button class="grid-swatch" class:sel={paintColor === color}
+						style="background:{color}"
+						title={color}
+						onclick={() => pickColor(color)}>
 					</button>
 				{/each}
 			</div>
@@ -1500,19 +1507,17 @@
 		display: block;
 	}
 
-	.recent-row {
-		display: flex; flex-wrap: wrap; gap: 4px;
+	.color-grid {
+		display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px;
 		padding: 8px; border-top: 1px solid #1e1e1e; flex-shrink: 0;
 	}
 
-	.recent-slot {
-		width: 22px; height: 22px; border-radius: 3px;
+	.grid-swatch {
+		width: 100%; aspect-ratio: 1; border-radius: 3px;
 		border: 2px solid #2a2a2a; cursor: pointer; padding: 0;
-		background: #111;
 	}
-	.recent-slot:disabled { opacity: 0.3; cursor: default; }
-	.recent-slot.sel { border-color: #fff; }
-	.recent-slot:not(:disabled):hover { border-color: #666; }
+	.grid-swatch.sel { border-color: #fff; }
+	.grid-swatch:hover { border-color: #666; }
 
 	.placeholder {
 		flex: 1; display: flex; align-items: center; justify-content: center;
