@@ -1,5 +1,9 @@
-// @ts-nocheck
+/**
+ * @param {{ state: string, send: (event: string) => void }} machine
+ * @param {{ toggle: () => void, back15: () => void, fwd15: () => void, prev: () => void, next: () => void }} actions
+ */
 export function bindKeyboard(machine, actions) {
+  /** @param {KeyboardEvent} e */
   function onKeydown(e) {
     if (machine.state !== 'playing' && machine.state !== 'paused') return;
     const k = e.key;

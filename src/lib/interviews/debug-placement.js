@@ -1,4 +1,4 @@
-// @ts-nocheck
+/** @param {HTMLElement} viewportEl */
 export function createDebugPlacement(viewportEl) {
   const el = document.createElement('div');
   el.className = 'debug-placement-area';
@@ -11,6 +11,7 @@ export function createDebugPlacement(viewportEl) {
   resizeHandle.className = 'dbg-resize-handle';
   el.appendChild(resizeHandle);
 
+  /** @type {Record<string, HTMLSpanElement>} */
   const labels = {};
   for (const pos of ['tl', 'tr', 'bl', 'br']) {
     const s = document.createElement('span');
@@ -42,6 +43,7 @@ export function createDebugPlacement(viewportEl) {
   apply();
   window.addEventListener('resize', apply);
 
+  /** @type {{ sx: number, sy: number, ox: number, oy: number } | null} */
   let drag = null;
   dragHandle.addEventListener('pointerdown', e => {
     drag = { sx: e.clientX, sy: e.clientY, ox: x, oy: y };
@@ -55,6 +57,7 @@ export function createDebugPlacement(viewportEl) {
   });
   dragHandle.addEventListener('pointerup', () => { drag = null; });
 
+  /** @type {{ sx: number, sy: number, ow: number, oh: number } | null} */
   let resize = null;
   resizeHandle.addEventListener('pointerdown', e => {
     resize = { sx: e.clientX, sy: e.clientY, ow: w, oh: h };
@@ -70,6 +73,7 @@ export function createDebugPlacement(viewportEl) {
   resizeHandle.addEventListener('pointerup', () => { resize = null; });
 
   return {
+    /** @param {{ clientX: number, clientY: number }} e */
     contains: (e) => {
       const ax = appLeft() + x;
       return e.clientX >= ax && e.clientX <= ax + w
