@@ -292,6 +292,7 @@
 	let editCanvas  = $state<HTMLCanvasElement>(null!);
 	let levelCanvas = $state<HTMLCanvasElement>(null!);
 	let cubeCanvas  = $state<HTMLCanvasElement>(null!);
+	let wallPreviewCanvas = $state<HTMLCanvasElement>(null!);
 
 	// ─── Derived ─────────────────────────────────────────────────────────────────
 	let selectedTile = $derived(tiles.find(t => t.id === selectedId) ?? null);
@@ -384,6 +385,21 @@
 	$effect(() => {
 		void paintColor;
 		drawColorCube();
+	});
+
+	function drawWallPreview() {
+		if (!wallPreviewCanvas || !selectedTile || selectedTile.type !== 'wall') return;
+		wallPreviewCanvas.width = CUBE_W;
+		wallPreviewCanvas.height = CUBE_H;
+		const ctx = wallPreviewCanvas.getContext('2d')!;
+		ctx.clearRect(0, 0, CUBE_W, CUBE_H);
+		drawIsoFloor(ctx, selectedTile, CUBE_OX, CUBE_OY, true, 0);
+	}
+
+	$effect(() => {
+		void renderTick;
+		void selectedTile?.type;
+		drawWallPreview();
 	});
 
 	// ─── Edit canvas interaction ──────────────────────────────────────────────────
@@ -1198,6 +1214,12 @@
 				</div>
 			</div>
 
+			{#if selectedTile.type === 'wall'}
+				<div class="wall-preview-row">
+					<canvas bind:this={wallPreviewCanvas} class="wall-preview"></canvas>
+				</div>
+			{/if}
+
 			{#if selectedTile.type === 'floor'}
 				<!-- biome group row -->
 				<div class="meta-row group-row">
@@ -1468,6 +1490,14 @@
 		display: block;
 		cursor: crosshair;
 		touch-action: none;
+	}
+
+	.wall-preview-row {
+		display: flex; justify-content: center; padding: 6px;
+		border-bottom: 1px solid #1a1a1a; flex-shrink: 0;
+	}
+	.wall-preview {
+		display: block;
 	}
 
 	.recent-row {
