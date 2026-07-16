@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { describe, it, expect } from 'vitest';
 import { seekBy, prevChapter, nextChapter, isLastChapter } from './transport.js';
 

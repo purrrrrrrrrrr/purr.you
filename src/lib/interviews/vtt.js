@@ -1,6 +1,6 @@
-// @ts-nocheck
 const TIMESTAMP = /^(\d{2}):(\d{2}):(\d{2})\.(\d{3})$/;
 
+/** @param {string} s */
 function parseTimestamp(s) {
   const m = TIMESTAMP.exec(s.trim());
   if (!m) return null;
@@ -8,6 +8,7 @@ function parseTimestamp(s) {
   return Number(hh) * 3600 + Number(mm) * 60 + Number(ss) + Number(ms) / 1000;
 }
 
+/** @param {string} input */
 export function parseVTT(input) {
   const lines = input.replace(/\r\n/g, '\n').split('\n');
   const cues = [];

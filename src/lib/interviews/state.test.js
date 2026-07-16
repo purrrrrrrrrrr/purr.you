@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { describe, it, expect } from 'vitest';
 import { createMachine } from './state.js';
 
@@ -57,6 +56,7 @@ describe('state machine', () => {
 
   it('notifies subscribers on transition', () => {
     const m = createMachine();
+    /** @type {string[]} */
     const seen = [];
     m.subscribe(s => seen.push(s));
     m.send('TIP_READY');

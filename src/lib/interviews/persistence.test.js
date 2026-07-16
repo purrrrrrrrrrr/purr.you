@@ -1,12 +1,18 @@
-// @ts-nocheck
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { saveProgress, loadProgress, clearProgress } from './persistence.js';
 
 const mockLocalStorage = (() => {
+  /** @type {Record<string, string>} */
   let store = {};
   return {
+    /** @param {string} key */
     getItem: (key) => store[key] || null,
+    /**
+     * @param {string} key
+     * @param {string} value
+     */
     setItem: (key, value) => { store[key] = value.toString(); },
+    /** @param {string} key */
     removeItem: (key) => { delete store[key]; },
     clear: () => { store = {}; }
   };
