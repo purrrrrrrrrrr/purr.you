@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import TeamHumanityCard from '$lib/team-humanity/TeamHumanityCard.svelte';
 
-	let people = $state(null);
+	let people = $state(/** @type {{ id: string, name: string, chapters: { audio: string }[] }[] | null} */ (null));
 	let questions = $state(null);
 
 	onMount(async () => {
@@ -15,7 +15,7 @@
 		questions = await questionsRes.json();
 
 		people = await Promise.all(
-			manifest.order.map(async (uuid) => {
+			manifest.order.map(async (/** @type {string} */ uuid) => {
 				const res = await fetch(`/team-humanity/${uuid}.json`);
 				const data = await res.json();
 				return { id: uuid, name: data.name, chapters: data.chapters };
