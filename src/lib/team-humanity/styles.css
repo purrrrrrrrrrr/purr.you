@@ -157,8 +157,8 @@
 		padding: 24px 24px 88px;
 	}
 
-	.nav-arrow.prev,
-	.nav-arrow.next {
+	.card > .nav-arrow.prev,
+	.card > .nav-arrow.next {
 		display: none;
 	}
 
