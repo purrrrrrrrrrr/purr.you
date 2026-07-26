@@ -66,6 +66,11 @@
 	}
 
 	onMount(() => {
+		// Set src imperatively before play(), mirroring goTo's approach — waiting on the
+		// reactive `src={currentAudioUrl}` binding alone races with this play() call, and
+		// the binding's later src write can abort the in-flight play() with AbortError,
+		// which gets misread as autoplay being blocked (NotAllowedError).
+		audioEl.src = currentAudioUrl;
 		audioEl.play().catch(() => {
 			autoplayBlocked = true;
 		});
