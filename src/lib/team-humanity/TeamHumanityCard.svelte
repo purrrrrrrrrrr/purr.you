@@ -19,6 +19,7 @@
 		chapterAudioUrl(currentPerson.id, currentPerson.chapters[position.chapterIndex])
 	);
 
+	/** @param {{personIndex: number, chapterIndex: number}} newPosition */
 	function goTo(newPosition) {
 		position = newPosition;
 		progress = 0;
