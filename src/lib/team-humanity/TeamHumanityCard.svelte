@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import './styles.css';
-	import { nextPosition, chapterAudioUrl } from './sequence.js';
+	import { nextPosition, prevPosition, chapterAudioUrl } from './sequence.js';
 
 	/** @type {{ people: { id: string, name: string, chapters: { audio: string }[] }[], questions: string[] }} */
 	let { people, questions } = $props();
@@ -39,6 +39,19 @@
 		goTo(nextPosition(people, position));
 	}
 
+	function handleNext() {
+		goTo(nextPosition(people, position));
+	}
+
+	function handlePrev() {
+		goTo(prevPosition(people, position));
+	}
+
+	/** @param {number} chapterIndex */
+	function handleChapterClick(chapterIndex) {
+		goTo({ personIndex: position.personIndex, chapterIndex });
+	}
+
 	function handleTimeUpdate() {
 		if (audioEl.duration > 0) {
 			progress = audioEl.currentTime / audioEl.duration;
@@ -61,6 +74,12 @@
 
 <div class="team-humanity-page">
 	<div class="card">
+		<button type="button" class="nav-arrow prev" onclick={handlePrev} aria-label="Previous">
+			←
+		</button>
+		<button type="button" class="nav-arrow next" onclick={handleNext} aria-label="Next">
+			→
+		</button>
 		<h1 class="card-title">team humanity</h1>
 		<hr class="card-divider" />
 		<p class="card-subtitle">humans are asked 3 simple questions{'\n'}about humans and themselves</p>
@@ -79,6 +98,7 @@
 					type="button"
 					class="chapter-btn"
 					class:active={i === position.chapterIndex}
+					onclick={() => handleChapterClick(i)}
 				>
 					{i + 1}
 				</button>
