@@ -1,0 +1,148 @@
+/* src/lib/team-humanity/styles.css */
+.team-humanity-page {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 100vh;
+	background: #572b00;
+	font-family: 'Alexandria', sans-serif;
+}
+
+.card {
+	position: relative;
+	width: 480px;
+	max-width: 90vw;
+	background: #ffb870;
+	color: #572b00;
+	padding: 24px;
+	box-sizing: border-box;
+}
+
+.card-title {
+	margin: 0 0 16px;
+	font-size: 20px;
+	font-weight: 400;
+}
+
+.card-divider {
+	border: none;
+	border-top: 1px solid #000;
+	opacity: 0.34;
+	margin: 0 0 16px;
+}
+
+.card-subtitle {
+	margin: 0 0 16px;
+	font-size: 16px;
+	line-height: 24px;
+	white-space: pre-line;
+}
+
+.card-speaker {
+	margin: 0 0 24px;
+	font-size: 20px;
+}
+
+.card-speaker-name {
+	font-weight: 700;
+}
+
+.card-speaker-label {
+	font-weight: 400;
+	font-size: 18px;
+}
+
+.question-box {
+	background: #572b00;
+	color: #ffb870;
+	padding: 22px 12px;
+	text-align: center;
+	font-size: 20px;
+	font-weight: 600;
+	line-height: 30px;
+	margin-bottom: 26px;
+	white-space: pre-line;
+}
+
+.chapters {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 12px;
+}
+
+.chapter-btn {
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	border: 2px solid #572b00;
+	background: transparent;
+	color: #572b00;
+	font-size: 20px;
+	font-weight: 500;
+	font-family: inherit;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.chapter-btn.active {
+	background: #572b00;
+	color: #ffb870;
+}
+
+.progress-track {
+	position: relative;
+	height: 2px;
+	background: #000;
+	margin: 0 4px 8px;
+}
+
+.progress-dot {
+	position: absolute;
+	top: 50%;
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	background: #572b00;
+	transform: translate(-50%, -50%);
+}
+
+.nav-arrow {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	border: 2px solid #ffb870;
+	background: transparent;
+	color: #ffb870;
+	font-size: 20px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.nav-arrow.prev {
+	right: 100%;
+	margin-right: 60px;
+}
+
+.nav-arrow.next {
+	left: 100%;
+	margin-left: 60px;
+}
+
+.tap-overlay {
+	position: absolute;
+	inset: 0;
+	background: rgba(87, 43, 0, 0.6);
+	color: #ffb870;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 18px;
+	cursor: pointer;
+}
