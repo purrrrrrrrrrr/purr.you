@@ -22,6 +22,7 @@
 	/** @param {{personIndex: number, chapterIndex: number}} newPosition */
 	function goTo(newPosition) {
 		position = newPosition;
+		consecutiveErrors = 0;
 		progress = 0;
 		const person = people[newPosition.personIndex];
 		const chapter = person.chapters[newPosition.chapterIndex];
@@ -36,6 +37,18 @@
 	}
 
 	function handleEnded() {
+		goTo(nextPosition(people, position));
+	}
+
+	let consecutiveErrors = 0;
+
+	function handleError() {
+		consecutiveErrors += 1;
+		if (consecutiveErrors > people.reduce((sum, p) => sum + p.chapters.length, 0)) {
+			// Every chapter in the whole sequence has failed — stop retrying, just show the block overlay.
+			autoplayBlocked = true;
+			return;
+		}
 		goTo(nextPosition(people, position));
 	}
 
@@ -132,8 +145,8 @@
 
 	<audio
 		bind:this={audioEl}
-		src={currentAudioUrl}
 		onended={handleEnded}
 		ontimeupdate={handleTimeUpdate}
+		onerror={handleError}
 	></audio>
 </div>
