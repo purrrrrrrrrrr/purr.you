@@ -146,3 +146,40 @@
 	font-size: 18px;
 	cursor: pointer;
 }
+
+.mobile-nav {
+	display: none;
+}
+
+@media (max-width: 767px) {
+	.card {
+		width: 100%;
+		padding: 24px 24px 88px;
+	}
+
+	.nav-arrow.prev,
+	.nav-arrow.next {
+		display: none;
+	}
+
+	.mobile-nav {
+		display: flex;
+		justify-content: space-between;
+		position: absolute;
+		left: 24px;
+		right: 24px;
+		bottom: 24px;
+	}
+
+	.mobile-nav .nav-arrow {
+		position: static;
+		transform: none;
+		background: #572b00;
+		color: #ffb870;
+		border: none;
+	}
+
+	.mobile-nav .nav-arrow.prev {
+		opacity: 0.6;
+	}
+}

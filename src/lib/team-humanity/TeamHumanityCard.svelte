@@ -109,6 +109,15 @@
 			<div class="progress-dot" style="left: {progress * 100}%"></div>
 		</div>
 
+		<div class="mobile-nav">
+			<button type="button" class="nav-arrow prev" onclick={handlePrev} aria-label="Previous">
+				←
+			</button>
+			<button type="button" class="nav-arrow next" onclick={handleNext} aria-label="Next">
+				→
+			</button>
+		</div>
+
 		{#if autoplayBlocked}
 			<button type="button" class="tap-overlay" onclick={handleOverlayClick}>
 				tap to begin
