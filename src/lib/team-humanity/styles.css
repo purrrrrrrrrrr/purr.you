@@ -3,6 +3,29 @@
 button {
 	font-family: Alexandria, sans-serif;
 	font-weight: 500;
+	outline: none;
+	user-select: none;
+}
+
+.card>.nav-arrow.prev {
+	left: -100px;
+}
+
+.card>.nav-arrow.next {
+	right: -100px;
+}
+
+.play-pause-btn {
+	width: 120px;
+	height: 60px;
+	background: #572b00;
+	color: #ffb870;
+	border: none;
+	font-size: 20px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .team-humanity-page {
@@ -12,6 +35,11 @@ button {
 	min-height: 100vh;
 	background: #572b00;
 	font-family: 'Alexandria', sans-serif;
+}
+
+.desktop-nav {
+	display: flex;
+	justify-content: center;
 }
 
 .card {
@@ -178,24 +206,15 @@ button {
 		bottom: 24px;
 	}
 
+	.desktop-nav {
+		display: none;
+	}
+
 	.mobile-nav .nav-arrow {
 		position: static;
 		transform: none;
 		background: #572b00;
 		color: #ffb870;
 		border: none;
-	}
-
-	.mobile-nav .play-pause-btn {
-		width: 120px;
-		height: 60px;
-		background: #572b00;
-		color: #ffb870;
-		border: none;
-		font-size: 20px;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
 	}
 }

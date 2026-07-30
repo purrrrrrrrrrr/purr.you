@@ -9,6 +9,7 @@
 	let position = $state({ personIndex: 0, chapterIndex: 0 });
 	let progress = $state(0); // 0..1
 	let autoplayBlocked = $state(false);
+	let isPlaying = $state(false);
 
 	/** @type {HTMLAudioElement} */
 	let audioEl;
@@ -88,6 +89,28 @@
 		});
 	}
 
+	function handleAudioPlay() {
+		isPlaying = true;
+	}
+
+	function handleAudioPause() {
+		isPlaying = false;
+	}
+
+	/** @param {KeyboardEvent} e */
+	function handleKeydown(e) {
+		if (e.code === 'Space') {
+			e.preventDefault();
+			handlePlay();
+		} else if (e.code === 'ArrowRight') {
+			e.preventDefault();
+			handleNext();
+		} else if (e.code === 'ArrowLeft') {
+			e.preventDefault();
+			handlePrev();
+		}
+	}
+
 	onMount(() => {
 		// Set src imperatively before play(), mirroring goTo's approach — waiting on the
 		// reactive `src={currentAudioUrl}` binding alone races with this play() call, and
@@ -97,6 +120,9 @@
 		audioEl.play().catch(() => {
 			autoplayBlocked = true;
 		});
+
+		window.addEventListener('keydown', handleKeydown);
+		return () => window.removeEventListener('keydown', handleKeydown);
 	});
 </script>
 
@@ -141,13 +167,24 @@
 			<div class="progress-dot" style="left: {progress * 100}%"></div>
 		</div>
 
+		<div class="desktop-nav">
+			<button type="button" class="play-pause-btn" onclick={handlePlay} aria-label={isPlaying ? 'Pause' : 'Play'}>
+				{isPlaying ? 'pause' : 'play'}
+			</button>
+		</div>
+
 		<div class="mobile-nav">
 			<button type="button" class="nav-arrow prev" onclick={handlePrev} aria-label="Previous">
 				←
 			</button>
 
-			<button type="button" class="play-pause-btn" onclick={handlePlay} aria-label="Play">
-				play
+			<button
+				type="button"
+				class="play-pause-btn"
+				onclick={handlePlay}
+				aria-label={isPlaying ? 'Pause' : 'Play'}
+			>
+				{isPlaying ? 'pause' : 'play'}
 			</button>
 
 			<button type="button" class="nav-arrow next" onclick={handleNext} aria-label="Next">
@@ -161,5 +198,7 @@
 		onended={handleEnded}
 		ontimeupdate={handleTimeUpdate}
 		onerror={handleError}
+		onplay={handleAudioPlay}
+		onpause={handleAudioPause}
 	></audio>
 </div>
