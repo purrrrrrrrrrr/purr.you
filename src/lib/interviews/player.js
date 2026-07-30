@@ -27,6 +27,8 @@ export function createPlayer() {
     onEnded(fn) { cbs.ended.push(fn); },
     /** @param {() => void} fn */
     onReady(fn) { cbs.ready.push(fn); },
+    /** @returns {HTMLAudioElement} */
+    getElement() { return audio; },
     destroy() { audio.pause(); }
   };
 }

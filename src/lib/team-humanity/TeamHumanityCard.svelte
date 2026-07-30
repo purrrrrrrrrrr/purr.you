@@ -60,6 +60,16 @@
 		goTo(prevPosition(people, position));
 	}
 
+	function handlePlay() {
+		if (audioEl.paused) {
+			audioEl.play().catch(() => {
+				autoplayBlocked = true;
+			});
+		} else {
+			audioEl.pause();
+		}
+	}
+
 	/** @param {number} chapterIndex */
 	function handleChapterClick(chapterIndex) {
 		goTo({ personIndex: position.personIndex, chapterIndex });
@@ -108,7 +118,11 @@
 			<span class="card-speaker-label">answering</span>
 		</p>
 
-		<div class="question-box">{currentQuestion}</div>
+		<div class="question-box">
+			<p>
+				{currentQuestion}
+			</p>
+		</div>
 
 		<div class="chapters">
 			{#each currentPerson.chapters as _, i (i)}
@@ -131,16 +145,15 @@
 			<button type="button" class="nav-arrow prev" onclick={handlePrev} aria-label="Previous">
 				←
 			</button>
+
+			<button type="button" class="play-pause-btn" onclick={handlePlay} aria-label="Play">
+				play
+			</button>
+
 			<button type="button" class="nav-arrow next" onclick={handleNext} aria-label="Next">
 				→
 			</button>
 		</div>
-
-		{#if autoplayBlocked}
-			<button type="button" class="tap-overlay" onclick={handleOverlayClick}>
-				tap to begin
-			</button>
-		{/if}
 	</div>
 
 	<audio

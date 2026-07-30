@@ -32,13 +32,13 @@ export function renderTransport(rightEl, databun) {
   rightEl.innerHTML = `
     <div class="timeline" id="timeline">
       <div class="timeline-label" id="chapter-label">${escapeHtml(databun.chapters[0].title)}</div>
-      <div class="timeline-bar">
-        ${databun.chapters.map((_, i) => `<span class="timeline-marker" data-idx="${i}"></span>`).join('')}
-        <span class="timeline-cursor" id="timeline-cursor"></span>
+      <div class="timeline-bar" id="timeline-bar">
+        <canvas class="timeline-waveform" id="timeline-waveform"></canvas>
+        <div class="timeline-flat"></div>
+        <div class="timeline-playhead"></div>
       </div>
       <div class="timeline-times">
-        <span id="elapsed">00:00</span>
-        <span id="remaining">-00:00</span>
+        <span id="total-time">0 (0)</span>
       </div>
     </div>
     <div class="control-buttons">
@@ -51,13 +51,4 @@ export function renderTransport(rightEl, databun) {
       </div>
     </div>
   `;
-}
-
-/** @param {number} seconds */
-export function fmtTime(seconds) {
-  if (!isFinite(seconds)) return '00:00';
-  const total = Math.max(0, Math.floor(seconds));
-  const m = String(Math.floor(total / 60)).padStart(2, '0');
-  const s = String(total % 60).padStart(2, '0');
-  return `${m}:${s}`;
 }

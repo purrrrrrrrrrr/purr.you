@@ -2,7 +2,8 @@ import { createTip } from './tip.js';
 import { createMachine } from './state.js';
 import { createCursor } from './cursor.js';
 import { createDrag } from './drag.js';
-import { renderDatabunInSlot, renderPlaybackViewport, renderTransport, fmtTime } from './ui.js';
+import { renderDatabunInSlot, renderPlaybackViewport, renderTransport } from './ui.js';
+import { createWaveform } from './waveform.js';
 import { loadDatabun } from './databun.js';
 import { createPlayer } from './player.js';
 import { createKaraoke } from './karaoke.js';
@@ -38,6 +39,19 @@ export function createInterviewsApp() {
   let drag = null;
   /** @type {(() => void) | null} */
   let unbindKeyboard = null;
+  /** @type {ReturnType<typeof createWaveform> | null} */
+  let waveform = null;
+
+  /** @param {number} t */
+  function updateTotalTime(t) {
+    const totalEl = document.getElementById('total-time');
+    if (!totalEl || !currentDatabun) return;
+    const chapters = currentDatabun.chapters;
+    let elapsedTotal = t;
+    for (let i = 0; i < chapterIndex; i++) elapsedTotal += chapters[i]._audio_duration_s || 0;
+    const grandTotal = chapters.reduce((/** @type {number} */ s, /** @type {any} */ c) => s + (c._audio_duration_s || 0), 0);
+    totalEl.textContent = `${Math.floor(elapsedTotal)} (${Math.floor(grandTotal)})`;
+  }
 
   function maybeSave() {
     const now = performance.now();
@@ -96,11 +110,14 @@ export function createInterviewsApp() {
     const vttText = await fetch(chapter.subs_url).then(r => r.text());
     chapterCues = parseVTT(vttText);
     /** @type {HTMLElement} */ (document.getElementById('chapter-label')).textContent = chapter.title;
-    if (firstChapterLoad) {
+    const isFirstLoad = firstChapterLoad;
+    if (isFirstLoad) {
       firstChapterLoad = false;
       renderPlaybackViewport(viewportEl);
-      const ctEl = /** @type {HTMLElement} */ (document.getElementById('chapter-title'));
-      ctEl.textContent = chapter.title;
+    }
+    const ctEl = /** @type {HTMLElement} */ (document.getElementById('chapter-title'));
+    ctEl.textContent = chapter.title;
+    if (isFirstLoad) {
       await tip.ready();
       tip.showText(currentDatabun.interviewee_name, () => {
         requestAnimationFrame(() => {
@@ -120,6 +137,11 @@ export function createInterviewsApp() {
     karaoke = createKaraoke(/** @type {HTMLElement} */ (document.getElementById('subs-track')), () => player.currentTime);
     karaoke.render(chapterCues);
     player.seek(startAt);
+    updateTotalTime(startAt);
+    if (machine.state === 'playing') {
+      player.play();
+      waveform?.start();
+    }
   }
 
   function bindTransport() {
@@ -130,8 +152,8 @@ export function createInterviewsApp() {
       player.seek(seekBy({ currentTime: player.currentTime, chapterDuration: player.duration }, 15));
     };
     /** @type {HTMLElement} */ (document.getElementById('t-play')).onclick = () => {
-      if (machine.state === 'playing') { player.pause(); machine.send('TOGGLE_PLAY'); }
-      else if (machine.state === 'paused') { player.play(); machine.send('TOGGLE_PLAY'); }
+      if (machine.state === 'playing') { player.pause(); machine.send('TOGGLE_PLAY'); waveform?.pause(); }
+      else if (machine.state === 'paused') { player.play(); machine.send('TOGGLE_PLAY'); waveform?.start(); }
     };
     /** @type {HTMLElement} */ (document.getElementById('t-prev')).onclick = async () => {
       const next = prevChapter(chapterIndex, currentDatabun.chapters.length);
@@ -146,16 +168,12 @@ export function createInterviewsApp() {
   function bindPlayback() {
     player.onTime((t) => {
       maybeSave();
-      const elapsed = document.getElementById('elapsed');
-      const remaining = document.getElementById('remaining');
-      if (elapsed) elapsed.textContent = fmtTime(t);
-      if (remaining) remaining.textContent = `-${fmtTime(player.duration - t)}`;
-      const tc = document.getElementById('timeline-cursor');
-      if (tc && player.duration > 0) tc.style.left = `${(t / player.duration) * 100}%`;
+      updateTotalTime(t);
     });
     player.onEnded(async () => {
       if (isLastChapter(chapterIndex, currentDatabun.chapters.length)) {
         machine.send('ENDED');
+        waveform?.pause();
       } else {
         await loadChapter(chapterIndex + 1);
       }
@@ -171,6 +189,8 @@ export function createInterviewsApp() {
     const consoleRight = /** @type {HTMLElement} */ (document.getElementById('console-right'));
     renderTransport(consoleRight, currentDatabun);
     bindTransport();
+    const waveformCanvas = /** @type {HTMLCanvasElement} */ (document.getElementById('timeline-waveform'));
+    waveform = createWaveform(player.getElement(), waveformCanvas);
     const saved = loadProgress(currentDatabun.id);
     await loadChapter(saved?.chapterIndex ?? 0, saved?.currentTime ?? 0);
     bindPlayback();
@@ -187,7 +207,7 @@ export function createInterviewsApp() {
   /** @type {ReturnType<typeof setTimeout> | null} */
   let tipReadyTimer = null;
   (async () => {
-    currentDatabun = await loadDatabun('frank-luna');
+    currentDatabun = await loadDatabun('luna');
 
     if (!isDesktop()) {
       drag = createDrag(app, slotEl, () => machine.send('PLACE'), (e) => debugPlacement.contains(e));
@@ -208,6 +228,7 @@ export function createInterviewsApp() {
       debugPlacement.destroy();
       drag?.destroy();
       karaoke?.destroy();
+      waveform?.destroy();
       player.destroy();
     }
   };

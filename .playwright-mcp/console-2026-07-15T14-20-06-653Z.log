@@ -1,0 +1,7 @@
+[    1310ms] [WARNING] Manifest: found icon with no valid purpose; ignoring it. @ https://m.vk.com/manifest.webmanifest?ver=228:0
+[    8967ms] [WARNING] SW controller not found. Skip message with data: {actions: Array(1)} @ https://st1-85.vk.com/dist/mobile/vendors~sentry.46cf38ffbe339843.js:0
+[    8967ms] [WARNING] SW controller not found. Skip message with data: {actions: Array(1)} @ https://st1-85.vk.com/dist/mobile/vendors~sentry.46cf38ffbe339843.js:0
+[   10170ms] [WARNING] Service Worker was not registered @ https://st1-85.vk.com/dist/mobile/vendors~sentry.46cf38ffbe339843.js:0
+[   10405ms] [WARNING] adhoc tasks must be groupable @ https://st1-85.vk.com/dist/mobile/vendors~sentry.46cf38ffbe339843.js:0
+[   10407ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://stats.vk-portal.net/:0
+[   10475ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://stats.vk-portal.net/:0

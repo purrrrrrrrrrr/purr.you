@@ -18,7 +18,7 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 	<link href="https://fonts.googleapis.com/css2?family=Gelasio:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="/wimmy/assets/index-BLrJzbal.css">
+	<link rel="stylesheet" href="/wimmy/assets/index-CTztRCzo.css">
 	<script>
 		// Force HLS.js on all browsers (including Safari which would use native HLS).
 		// Native HLS buffers only ~12s; HLS.js is configured for 600s maxBufferLength.
@@ -45,7 +45,7 @@
 			setTimeout(loop, 1500);
 		})();
 	</script>
-	<script type="module" src="/wimmy/assets/index-9sCg6n4W.js"></script>
+	<script type="module" src="/wimmy/assets/index-CFZvY-XB.js"></script>
 </svelte:head>
 
 <div id="app"></div>

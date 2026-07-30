@@ -1,0 +1,32 @@
+- generic [ref=e3]:
+  - heading "Interview With a Human" [level=1] [ref=e4]: InterviewWith a Human
+  - generic [ref=e5]:
+    - generic [ref=e6]: FRANK LUNA
+    - generic [ref=e17]: INTRO
+    - generic [ref=e19]:
+      - generic [ref=e20]:
+        - text: So, hello, we are here with Frank Luna,
+        - generic [ref=e21]: So, hello, we are here with Frank Luna,
+      - generic [ref=e22]:
+        - text: great fella in.
+        - generic [ref=e23]: great fella in.
+      - generic [ref=e24]:
+        - text: He is a Colombian person who knows things.
+        - generic [ref=e25]: He is a Colombian person who knows things.
+  - generic [ref=e8]:
+    - generic [ref=e9]:
+      - generic "Databun slot" [ref=e10]: FRANK LUNA
+      - button "Load" [active] [ref=e12]:
+        - generic [ref=e13]: LOAD
+    - generic [ref=e15]:
+      - generic [ref=e26]:
+        - generic [ref=e27]: INTRO
+        - generic [ref=e30]:
+          - generic [ref=e31]: 00:00
+          - generic [ref=e32]: "-00:00"
+      - generic [ref=e34]:
+        - button "-15 SEC" [ref=e35]
+        - button "PREV" [ref=e38]
+        - button "PLAY / PAUSE" [ref=e41]
+        - button "NEXT" [ref=e44]
+        - button "+15 SEC" [ref=e47]

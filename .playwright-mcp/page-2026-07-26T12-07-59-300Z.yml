@@ -1,0 +1,18 @@
+- generic [ref=f2e2]:
+  - generic [ref=f2e3]:
+    - generic:
+      - generic:
+        - img "Wimmy"
+        - generic: I am Wimmy The Scroll!
+      - generic:
+        - link "wimmy@purr.you" [ref=f2e4] [cursor=pointer]:
+          - /url: mailto:wimmy@purr.you
+        - button "Copy email" [ref=f2e5] [cursor=pointer]
+    - main [ref=f2e9]:
+      - generic [ref=f2e10]:
+        - paragraph: swipe to navigate
+  - generic:
+    - generic:
+      - paragraph: Distributed to Wimbledonians one printed scroll at a time.
+      - link "Have a story or a question?" [ref=f2e12] [cursor=pointer]:
+        - /url: mailto:wimmy@purr.you

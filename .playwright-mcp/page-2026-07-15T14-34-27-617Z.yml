@@ -1,0 +1,7 @@
+- generic [ref=f2e3]:
+  - heading "Interview With a Human" [level=1] [ref=f2e4]: InterviewWith a Human
+  - generic [ref=f2e5]: LOAD DATA
+  - generic [ref=f2e9]:
+    - generic "Databun slot" [ref=f2e10]: FRANK LUNA
+    - button "Load" [ref=f2e12]:
+      - generic [ref=f2e13]: LOAD

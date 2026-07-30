@@ -137,6 +137,7 @@ body {
   display: grid;
   gap: 1.5rem;
   width: 100px;
+  height: 244px;
 }
 
 .console-right {
@@ -383,35 +384,42 @@ body {
 
 .timeline-bar {
   position: relative;
-  height: 2px;
-  background: var(--fg);
+  height: 36px;
+  overflow: hidden;
 }
 
-.timeline-marker {
+.timeline-waveform {
   position: absolute;
-  top: -4px;
-  width: 10px;
-  height: 10px;
-  border: 1px solid var(--fg);
-  background: var(--bg);
-  border-radius: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  display: block;
 }
 
-.timeline-cursor {
+.timeline-flat {
   position: absolute;
-  top: -5px;
-  width: 12px;
-  height: 12px;
+  right: 0;
+  top: 50%;
+  width: 50%;
+  height: 1px;
+  background: color-mix(in srgb, var(--fg) 35%, transparent);
+  transform: translateY(-50%);
+}
+
+.timeline-playhead {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 2px;
+  height: 100%;
   background: var(--fg);
-  border-radius: 50%;
   transform: translateX(-50%);
   pointer-events: none;
 }
 
 .timeline-times {
-  display: flex;
-  justify-content: space-between;
+  text-align: center;
   font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
 }

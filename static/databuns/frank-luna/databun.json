@@ -7,7 +7,8 @@
       "id": "intro",
       "title": "INTRO",
       "audio_url": "/databuns/frank-luna/intro.mp3",
-      "subs_url": "/databuns/frank-luna/intro.vtt"
+      "subs_url": "/databuns/frank-luna/intro.vtt",
+      "_audio_duration_s": 10.0
     }
   ]
 }

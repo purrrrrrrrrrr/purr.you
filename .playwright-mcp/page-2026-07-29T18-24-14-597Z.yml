@@ -1,0 +1,11 @@
+- generic [active] [ref=e1]:
+  - spinbutton [ref=e3]: "1"
+  - spinbutton [ref=e4]: "2"
+  - spinbutton [ref=e6]: "1"
+  - generic [ref=e7]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - button "save config" [ref=e10] [cursor=pointer]
+        - generic [ref=e11]: 1.0s
+      - button "export config" [ref=e12] [cursor=pointer]
+    - button "load config" [ref=e13] [cursor=pointer]

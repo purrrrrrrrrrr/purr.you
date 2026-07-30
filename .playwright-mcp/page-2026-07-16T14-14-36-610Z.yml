@@ -1,0 +1,56 @@
+- generic [ref=f2e3]:
+  - heading "Interview With a Human" [level=1] [ref=f2e4]: InterviewWith a Human
+  - generic [ref=f2e5]:
+    - generic [ref=f2e6]: LUNA
+    - generic [ref=f2e17]:
+      - generic [ref=f2e18]:
+        - text: Lorem ipsum dolor sit amet consectetur,
+        - generic [ref=f2e19]: Lorem ipsum dolor sit amet consectetur,
+      - generic [ref=f2e20]:
+        - text: Adipiscing elit sed do eiusmod tempor,
+        - generic [ref=f2e21]: Adipiscing elit sed do eiusmod tempor,
+      - generic [ref=f2e22]:
+        - text: Incididunt ut labore et dolore magna,
+        - generic [ref=f2e23]: Incididunt ut labore et dolore magna,
+      - generic [ref=f2e24]:
+        - text: Aliqua ut enim ad minim veniam.
+        - generic [ref=f2e25]: Aliqua ut enim ad minim veniam.
+      - generic [ref=f2e26]:
+        - text: Quis nostrud exercitation ullamco laboris nisi,
+        - generic [ref=f2e27]: Quis nostrud exercitation ullamco laboris nisi,
+      - generic [ref=f2e28]:
+        - text: Ut aliquip ex ea commodo consequat,
+        - generic [ref=f2e29]: Ut aliquip ex ea commodo consequat,
+      - generic [ref=f2e30]:
+        - text: Duis aute irure dolor in reprehenderit,
+        - generic [ref=f2e31]: Duis aute irure dolor in reprehenderit,
+      - generic [ref=f2e32]:
+        - text: In voluptate velit esse cillum dolore.
+        - generic [ref=f2e33]: In voluptate velit esse cillum dolore.
+      - generic [ref=f2e34]:
+        - text: Eu fugiat nulla pariatur excepteur sint,
+        - generic [ref=f2e35]: Eu fugiat nulla pariatur excepteur sint,
+      - generic [ref=f2e36]:
+        - text: Occaecat cupidatat non proident sunt in,
+        - generic [ref=f2e37]: Occaecat cupidatat non proident sunt in,
+      - generic [ref=f2e38]:
+        - text: Culpa qui officia deserunt mollit anim,
+        - generic [ref=f2e39]: Culpa qui officia deserunt mollit anim,
+      - generic [ref=f2e40]:
+        - text: Id est laborum lorem ipsum dolor.
+        - generic [ref=f2e41]: Id est laborum lorem ipsum dolor.
+  - generic [ref=f2e8]:
+    - generic [ref=f2e9]:
+      - generic "Databun slot" [ref=f2e10]: LUNA
+      - button "Load" [ref=f2e12]:
+        - generic [ref=f2e13]: LOAD
+    - generic [ref=f2e101]:
+      - generic [ref=f2e81]:
+        - generic [ref=f2e82]: 00:00
+        - generic [ref=f2e83]: "-00:42"
+      - generic [ref=f2e85]:
+        - button "-15 SEC" [ref=f2e86]
+        - button "PREV" [ref=f2e89]
+        - button "PLAY / PAUSE" [active] [ref=f2e92]
+        - button "NEXT" [ref=f2e95]
+        - button "+15 SEC" [ref=f2e98]

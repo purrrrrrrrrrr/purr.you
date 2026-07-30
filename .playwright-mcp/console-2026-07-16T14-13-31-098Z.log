@@ -1,0 +1,5 @@
+[      79ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://localhost:7778/interviews:0
+[   64998ms] TypeError: Cannot read properties of undefined (reading 'push')
+    at HTMLMediaElement.play (eval at <anonymous> (eval at evaluate (:303:30)), <anonymous>:6:18)
+    at Object.play (http://localhost:7778/src/lib/interviews/player.js:18:27)
+    at HTMLButtonElement.onclick (http://localhost:7778/src/lib/interviews/app.js:134:53)

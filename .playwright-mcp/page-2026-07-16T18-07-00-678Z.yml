@@ -1,0 +1,20 @@
+- generic [ref=e3]:
+  - heading "Interview With a Human" [level=1] [ref=e4]: InterviewWith a Human
+  - generic [ref=e5]:
+    - generic [ref=e6]: LUNA
+    - generic [ref=e18]:
+      - text: Lorem ipsum dolor sit amet consectetur,
+      - generic [ref=e19]: Lorem ipsum dolor sit amet consectetur,
+  - generic [ref=e8]:
+    - generic [ref=e9]:
+      - generic "Databun slot" [ref=e10]: LUNA
+      - button "Load" [ref=e12]:
+        - generic [ref=e13]: LOAD
+    - generic [ref=e42]:
+      - generic [ref=e20]: 612 (1150)
+      - generic [ref=e26]:
+        - button "-15 SEC" [ref=e27]
+        - button "PREV" [ref=e30]
+        - button "PLAY / PAUSE" [active] [ref=e33]
+        - button "NEXT" [ref=e36]
+        - button "+15 SEC" [ref=e39]
