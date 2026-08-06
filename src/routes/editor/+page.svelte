@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { insertFrame, removeFrame, migrateTileFrames, type RawTile } from './animation';
+	import { insertFrame, removeFrame, onionGhostIndices, ghostAlpha, migrateTileFrames, type RawTile } from './animation';
 
 	// ─── Isometric constants ─────────────────────────────────────────────────────
 	const ISO_W = 64;
@@ -340,6 +340,7 @@
 	// ─── Frame animation state ──────────────────────────────────────────────────
 	let frameIndex = $state(0);
 	let isPlaying  = $state(false);
+	let onionDepth = $state(1);
 
 	$effect(() => {
 		void selectedId;
@@ -405,6 +406,21 @@
 				ctx.fillRect(x * s, y * s, s, s);
 			}
 
+		// onion skin: fading ghosts of previous frames, skipped while playing
+		if (!isPlaying && onionDepth > 0 && tile.frames.length > 1) {
+			const ghosts = onionGhostIndices(frameIndex, tile.frames.length, onionDepth);
+			for (let rank = ghosts.length; rank >= 1; rank--) {
+				const ghostPixels = tile.frames[ghosts[rank - 1]];
+				ctx.globalAlpha = ghostAlpha(rank, onionDepth);
+				for (let y = 0; y < tile.h; y++)
+					for (let x = 0; x < tile.w; x++) {
+						const c = ghostPixels[y * tile.w + x];
+						if (c) { ctx.fillStyle = c; ctx.fillRect(x * s, y * s, s, s); }
+					}
+			}
+			ctx.globalAlpha = 1;
+		}
+
 		// pixels
 		for (let y = 0; y < tile.h; y++)
 			for (let x = 0; x < tile.w; x++) {
@@ -426,6 +442,8 @@
 	$effect(() => {
 		void selectedTile?.frames[frameIndex]?.join('');
 		void editScale;
+		void onionDepth;
+		void isPlaying;
 		redrawEdit();
 	});
 
@@ -1168,6 +1186,7 @@
 				localStorage.setItem('editor-tiles', JSON.stringify(tiles));
 				localStorage.setItem('editor-level', JSON.stringify(level));
 				localStorage.setItem('editor-colorgrid', JSON.stringify(colorGrid));
+				localStorage.setItem('editor-oniondepth', JSON.stringify(onionDepth));
 			} catch {}
 		}, 600) as unknown as number;
 	}
@@ -1177,6 +1196,7 @@
 			const t = localStorage.getItem('editor-tiles');
 			const l = localStorage.getItem('editor-level');
 			const cg = localStorage.getItem('editor-colorgrid');
+			const od = localStorage.getItem('editor-oniondepth');
 			if (t) tiles = (JSON.parse(t) as RawTile[]).map(migrateTileFrames) as unknown as TileDef[];
 			if (l) {
 				const raw = JSON.parse(l) as Level;
@@ -1188,6 +1208,7 @@
 				};
 			}
 			if (cg) colorGrid = JSON.parse(cg);
+			if (od) onionDepth = Math.max(0, Math.min(8, JSON.parse(od)));
 			selectedId = tiles[0]?.id ?? null;
 		} catch {}
 	}
@@ -1383,6 +1404,14 @@
 					<button class="icon-btn" disabled={isPlaying} title="duplicate frame" onclick={duplicateFrame}>⧉</button>
 					<button class="icon-btn" disabled={isPlaying || selectedTile.frames.length === 1} title="remove frame" onclick={removeCurrentFrame}>✕</button>
 				</div>
+			</div>
+
+			<div class="anim-controls">
+				<label class="anim-field" title="onion skin depth (previous frames shown while editing)">
+					<span>onion</span>
+					<input type="number" min="0" max="8" value={onionDepth}
+						onchange={(e) => onionDepth = Math.max(0, Math.min(8, +(e.target as HTMLInputElement).value))} />
+				</label>
 			</div>
 
 			<!-- edit canvas -->
@@ -1618,6 +1647,13 @@
 	.frame-thumb:disabled { cursor: default; opacity: 0.6; }
 	.frame-actions { display: flex; gap: 4px; flex-shrink: 0; }
 	.icon-btn:disabled { opacity: 0.35; cursor: default; }
+
+	.anim-controls { display: flex; align-items: center; gap: 10px; padding: 4px 8px 8px; flex-shrink: 0; }
+	.anim-field { display: flex; align-items: center; gap: 4px; color: #666; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+	.anim-field input {
+		width: 40px; background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 3px;
+		color: #aaa; font-family: monospace; font-size: 11px; padding: 3px 4px; text-align: center; outline: none;
+	}
 
 	.canvas-scroll {
 		flex: 1; overflow: auto; display: flex;
