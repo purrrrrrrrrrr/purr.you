@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { insertFrame, removeFrame, onionGhostIndices, ghostAlpha, migrateTileFrames, type RawTile } from './animation';
+	import { insertFrame, removeFrame, onionGhostIndices, ghostAlpha, clampFps, migrateTileFrames, type RawTile } from './animation';
 
 	// ─── Isometric constants ─────────────────────────────────────────────────────
 	const ISO_W = 64;
@@ -1058,6 +1058,13 @@
 		debounceSave();
 	}
 
+	function setTileFps(fps: number) {
+		if (!selectedId) return;
+		const clamped = clampFps(fps);
+		tiles = tiles.map(t => t.id === selectedId ? { ...t, fps: clamped } : t);
+		debounceSave();
+	}
+
 	function setTileType(type: TileType) {
 		if (!selectedId) return;
 		tiles = tiles.map(t => t.id === selectedId
@@ -1259,7 +1266,11 @@
 	function onKeyDown(e: KeyboardEvent) {
 		if (e.key === 'Escape' && editingSlot !== null) { closeSwatchEditor(); return; }
 		if (e.target instanceof HTMLInputElement) return;
-		if (e.key === 'r' || e.key === 'R') rotateSelectedCell();
+		if (e.key === 'r' || e.key === 'R') { rotateSelectedCell(); return; }
+		if (e.metaKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown') && selectedTile) {
+			e.preventDefault();
+			setTileFps((selectedTile.fps ?? 8) + (e.key === 'ArrowUp' ? 1 : -1));
+		}
 	}
 
 	onMount(() => {
@@ -1411,6 +1422,11 @@
 					<span>onion</span>
 					<input type="number" min="0" max="8" value={onionDepth}
 						onchange={(e) => onionDepth = Math.max(0, Math.min(8, +(e.target as HTMLInputElement).value))} />
+				</label>
+				<label class="anim-field" title="frames per second (Cmd+Up / Cmd+Down)">
+					<span>fps</span>
+					<input type="number" min="1" max="60" value={selectedTile.fps ?? 8}
+						onchange={(e) => setTileFps(+(e.target as HTMLInputElement).value)} />
 				</label>
 			</div>
 
