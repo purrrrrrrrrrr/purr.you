@@ -393,7 +393,7 @@
 	function redrawEdit() {
 		if (!editCanvas || !selectedTile) return;
 		const tile = selectedTile, s = editScale;
-		const framePixels = tile.frames[frameIndex];
+		const framePixels = tile.frames[Math.min(frameIndex, tile.frames.length - 1)];
 		editCanvas.width  = tile.w * s;
 		editCanvas.height = tile.h * s;
 		const ctx = editCanvas.getContext('2d')!;
@@ -484,7 +484,8 @@
 	function paintPixel(x: number, y: number) {
 		if (!selectedTile) return;
 		const tile = selectedTile;
-		const framePixels = tile.frames[frameIndex];
+		const clampedFrameIndex = Math.min(frameIndex, tile.frames.length - 1);
+		const framePixels = tile.frames[clampedFrameIndex];
 
 		let newPixels: string[];
 
@@ -518,7 +519,7 @@
 			}
 		}
 
-		const newFrames = tile.frames.map((f, i) => i === frameIndex ? newPixels : f);
+		const newFrames = tile.frames.map((f, i) => i === clampedFrameIndex ? newPixels : f);
 		tiles = tiles.map(t => t.id === tile.id ? { ...t, frames: newFrames } : t);
 		invalidateTex(tile.id);
 		requestRender();
@@ -1273,6 +1274,8 @@
 				if (data.level) level = data.level;
 				texCache.clear();
 				selectedId = tiles[0]?.id ?? null;
+				frameIndex = 0;
+				isPlaying = false;
 				requestRender();
 				debounceSave();
 			} catch { alert('invalid JSON'); }
@@ -1417,7 +1420,7 @@
 			<!-- frame strip -->
 			<div class="frame-strip">
 				<div class="frame-thumbs">
-					{#each selectedTile.frames as frame, i (i)}
+					{#each selectedTile.frames as frame, i (selectedTile.id + ':' + i)}
 						<button class="frame-thumb" class:active={frameIndex === i}
 							disabled={isPlaying}
 							title="frame {i + 1}"
@@ -1439,12 +1442,22 @@
 				<label class="anim-field" title="onion skin depth (previous frames shown while editing)">
 					<span>onion</span>
 					<input type="number" min="0" max="8" value={onionDepth}
-						onchange={(e) => onionDepth = Math.max(0, Math.min(8, +(e.target as HTMLInputElement).value))} />
+						onchange={(e) => {
+							const el = e.target as HTMLInputElement;
+							const clamped = Math.max(0, Math.min(8, +el.value));
+							onionDepth = clamped;
+							el.value = String(clamped);
+							debounceSave();
+						}} />
 				</label>
 				<label class="anim-field" title="frames per second (Cmd+Up / Cmd+Down)">
 					<span>fps</span>
 					<input type="number" min="1" max="60" value={selectedTile.fps ?? 8}
-						onchange={(e) => setTileFps(+(e.target as HTMLInputElement).value)} />
+						onchange={(e) => {
+							const el = e.target as HTMLInputElement;
+							setTileFps(+el.value);
+							el.value = String(clampFps(+el.value));
+						}} />
 				</label>
 				<button class="tool" class:active={isPlaying}
 					disabled={selectedTile.frames.length <= 1}
