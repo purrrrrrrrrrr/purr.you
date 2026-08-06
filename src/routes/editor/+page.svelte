@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { insertFrame, removeFrame, migrateTileFrames, type RawTile } from './animation';
 
 	// ─── Isometric constants ─────────────────────────────────────────────────────
 	const ISO_W = 64;
@@ -21,7 +22,8 @@
 		name: string;
 		w: number;
 		h: number;
-		pixels: string[];
+		frames: string[][];          // one pixel array (length w*h) per animation frame; frames[0] is what the level canvas, tile library, and wall preview render
+		fps?: number;                // playback speed for the pixel-editor's animation preview; defaults to 8 when absent
 		type: TileType;
 		group?: string;              // biome family id, e.g. "grass" | "forest" | "lake" — floor tiles only
 		variant?: 'center' | 'edge'; // role within the group — floor tiles only
@@ -335,6 +337,16 @@
 	);
 	let knownGroups = $derived([...new Set(tiles.map(t => t.group).filter((g): g is string => !!g))]);
 
+	// ─── Frame animation state ──────────────────────────────────────────────────
+	let frameIndex = $state(0);
+	let isPlaying  = $state(false);
+
+	$effect(() => {
+		void selectedId;
+		frameIndex = 0;
+		isPlaying = false;
+	});
+
 	// ─── Texture cache ────────────────────────────────────────────────────────────
 	const texCache = new Map<string, OffscreenCanvas>();
 
@@ -348,9 +360,10 @@
 		if (!c) {
 			c = new OffscreenCanvas(tile.w, tile.h);
 			const ctx = c.getContext('2d')!;
+			const restFrame = tile.frames[0];
 			for (let y = 0; y < tile.h; y++)
 				for (let x = 0; x < tile.w; x++) {
-					const col = tile.pixels[y * tile.w + x];
+					const col = restFrame[y * tile.w + x];
 					if (col) { ctx.fillStyle = col; ctx.fillRect(x, y, 1, 1); }
 				}
 			texCache.set(tile.id, c);
@@ -379,6 +392,7 @@
 	function redrawEdit() {
 		if (!editCanvas || !selectedTile) return;
 		const tile = selectedTile, s = editScale;
+		const framePixels = tile.frames[frameIndex];
 		editCanvas.width  = tile.w * s;
 		editCanvas.height = tile.h * s;
 		const ctx = editCanvas.getContext('2d')!;
@@ -394,7 +408,7 @@
 		// pixels
 		for (let y = 0; y < tile.h; y++)
 			for (let x = 0; x < tile.w; x++) {
-				const c = tile.pixels[y * tile.w + x];
+				const c = framePixels[y * tile.w + x];
 				if (c) { ctx.fillStyle = c; ctx.fillRect(x * s, y * s, s, s); }
 			}
 
@@ -410,7 +424,7 @@
 	}
 
 	$effect(() => {
-		void selectedTile?.pixels.join('');
+		void selectedTile?.frames[frameIndex]?.join('');
 		void editScale;
 		redrawEdit();
 	});
@@ -452,13 +466,14 @@
 	function paintPixel(x: number, y: number) {
 		if (!selectedTile) return;
 		const tile = selectedTile;
+		const framePixels = tile.frames[frameIndex];
 
 		let newPixels: string[];
 
 		if (activeTool === 'fill') {
-			const target = tile.pixels[y * tile.w + x];
+			const target = framePixels[y * tile.w + x];
 			const color  = paintColor;
-			newPixels = [...tile.pixels];
+			newPixels = [...framePixels];
 			const stack = [y * tile.w + x];
 			const visited = new Set<number>();
 			while (stack.length) {
@@ -475,7 +490,7 @@
 		} else {
 			const color = activeTool === 'erase' ? '' : paintColor;
 			const half  = Math.floor(brushSize / 2);
-			newPixels   = [...tile.pixels];
+			newPixels   = [...framePixels];
 			for (let dy = -half; dy < brushSize - half; dy++) {
 				for (let dx = -half; dx < brushSize - half; dx++) {
 					const bx = x + dx, by = y + dy;
@@ -485,7 +500,8 @@
 			}
 		}
 
-		tiles = tiles.map(t => t.id === tile.id ? { ...t, pixels: newPixels } : t);
+		const newFrames = tile.frames.map((f, i) => i === frameIndex ? newPixels : f);
+		tiles = tiles.map(t => t.id === tile.id ? { ...t, frames: newFrames } : t);
 		invalidateTex(tile.id);
 		requestRender();
 	}
@@ -994,7 +1010,7 @@
 			id: crypto.randomUUID(),
 			name: opts?.name ?? `${activeType} ${typedTiles.length + 1}`,
 			w, h, type: activeType,
-			pixels: new Array(w * h).fill(''),
+			frames: [new Array(w * h).fill('')],
 			group: opts?.group,
 			variant: opts?.variant,
 		};
@@ -1050,7 +1066,7 @@
 	function resizeTile(w: number, h: number) {
 		if (!selectedId) return;
 		tiles = tiles.map(t => t.id === selectedId
-			? { ...t, w, h, pixels: new Array(w * h).fill('') } : t);
+			? { ...t, w, h, frames: t.frames.map(() => new Array(w * h).fill('')) } : t);
 		invalidateTex(selectedId);
 		requestRender();
 		debounceSave();
@@ -1079,14 +1095,68 @@
 		function draw(t: TileDef) {
 			const ctx = node.getContext('2d')!;
 			ctx.clearRect(0, 0, t.w, t.h);
+			const restFrame = t.frames[0];
 			for (let y = 0; y < t.h; y++)
 				for (let x = 0; x < t.w; x++) {
-					const c = t.pixels[y * t.w + x];
+					const c = restFrame[y * t.w + x];
 					if (c) { ctx.fillStyle = c; ctx.fillRect(x, y, 1, 1); }
 				}
 		}
 		draw(tile);
 		return { update: draw };
+	}
+
+	function frameThumb(node: HTMLCanvasElement, frame: { pixels: string[]; w: number; h: number }) {
+		function draw(f: { pixels: string[]; w: number; h: number }) {
+			const ctx = node.getContext('2d')!;
+			ctx.clearRect(0, 0, f.w, f.h);
+			for (let y = 0; y < f.h; y++)
+				for (let x = 0; x < f.w; x++) {
+					const c = f.pixels[y * f.w + x];
+					if (c) { ctx.fillStyle = c; ctx.fillRect(x, y, 1, 1); }
+				}
+		}
+		draw(frame);
+		return { update: draw };
+	}
+
+	function selectFrame(i: number) {
+		if (isPlaying) return;
+		frameIndex = i;
+	}
+
+	function addFrame() {
+		if (!selectedTile || isPlaying) return;
+		const tile = selectedTile;
+		const blank = new Array(tile.w * tile.h).fill('');
+		const { frames, index } = insertFrame(tile.frames, frameIndex, blank);
+		tiles = tiles.map(t => t.id === tile.id ? { ...t, frames } : t);
+		frameIndex = index;
+		invalidateTex(tile.id);
+		requestRender();
+		debounceSave();
+	}
+
+	function duplicateFrame() {
+		if (!selectedTile || isPlaying) return;
+		const tile = selectedTile;
+		const { frames, index } = insertFrame(tile.frames, frameIndex, [...tile.frames[frameIndex]]);
+		tiles = tiles.map(t => t.id === tile.id ? { ...t, frames } : t);
+		frameIndex = index;
+		invalidateTex(tile.id);
+		requestRender();
+		debounceSave();
+	}
+
+	function removeCurrentFrame() {
+		if (!selectedTile || isPlaying || selectedTile.frames.length <= 1) return;
+		const tile = selectedTile;
+		const { frames, index } = removeFrame(tile.frames, frameIndex);
+		tiles = tiles.map(t => t.id === tile.id ? { ...t, frames } : t);
+		frameIndex = index;
+		invalidateTex(tile.id);
+		requestRender();
+		debounceSave();
 	}
 
 	// ─── Persistence ──────────────────────────────────────────────────────────────
@@ -1107,7 +1177,7 @@
 			const t = localStorage.getItem('editor-tiles');
 			const l = localStorage.getItem('editor-level');
 			const cg = localStorage.getItem('editor-colorgrid');
-			if (t) tiles = JSON.parse(t);
+			if (t) tiles = (JSON.parse(t) as RawTile[]).map(migrateTileFrames) as unknown as TileDef[];
 			if (l) {
 				const raw = JSON.parse(l) as Level;
 				// normalise any legacy string cells
@@ -1154,7 +1224,7 @@
 		file.text().then(text => {
 			try {
 				const data = JSON.parse(text);
-				if (data.tiles) tiles = data.tiles;
+				if (data.tiles) tiles = (data.tiles as RawTile[]).map(migrateTileFrames) as unknown as TileDef[];
 				if (data.level) level = data.level;
 				texCache.clear();
 				selectedId = tiles[0]?.id ?? null;
@@ -1292,6 +1362,27 @@
 						<span class="brush-dot" style="width:{b*3}px;height:{b*3}px"></span>
 					</button>
 				{/each}
+			</div>
+
+			<!-- frame strip -->
+			<div class="frame-strip">
+				<div class="frame-thumbs">
+					{#each selectedTile.frames as frame, i (i)}
+						<button class="frame-thumb" class:active={frameIndex === i}
+							disabled={isPlaying}
+							title="frame {i + 1}"
+							onclick={() => selectFrame(i)}>
+							<canvas width={selectedTile.w} height={selectedTile.h}
+								style="image-rendering:pixelated; width:24px; height:24px"
+								use:frameThumb={{ pixels: frame, w: selectedTile.w, h: selectedTile.h }}></canvas>
+						</button>
+					{/each}
+				</div>
+				<div class="frame-actions">
+					<button class="icon-btn" disabled={isPlaying} title="add frame" onclick={addFrame}>+</button>
+					<button class="icon-btn" disabled={isPlaying} title="duplicate frame" onclick={duplicateFrame}>⧉</button>
+					<button class="icon-btn" disabled={isPlaying || selectedTile.frames.length === 1} title="remove frame" onclick={removeCurrentFrame}>✕</button>
+				</div>
 			</div>
 
 			<!-- edit canvas -->
@@ -1513,6 +1604,20 @@
 		display: block; background: #aaa; border-radius: 1px;
 	}
 	.brush-btn.active .brush-dot { background: #aaaaff; }
+
+	.frame-strip {
+		display: flex; align-items: center; justify-content: space-between; gap: 8px;
+		padding: 6px 8px; border-bottom: 1px solid #1a1a1a; flex-shrink: 0;
+	}
+	.frame-thumbs { display: flex; gap: 4px; overflow-x: auto; flex: 1; }
+	.frame-thumb {
+		background: none; border: 1px solid #2a2a2a; border-radius: 3px;
+		padding: 2px; cursor: pointer; flex-shrink: 0; line-height: 0;
+	}
+	.frame-thumb.active { border-color: #6ddb6d; }
+	.frame-thumb:disabled { cursor: default; opacity: 0.6; }
+	.frame-actions { display: flex; gap: 4px; flex-shrink: 0; }
+	.icon-btn:disabled { opacity: 0.35; cursor: default; }
 
 	.canvas-scroll {
 		flex: 1; overflow: auto; display: flex;
