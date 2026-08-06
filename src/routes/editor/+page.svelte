@@ -525,13 +525,14 @@
 	}
 
 	function onEditDown(e: MouseEvent) {
+		if (isPlaying) return;
 		e.preventDefault();
 		isDrawing = true;
 		const coord = editCoord(e);
 		if (coord) { paintPixel(...coord); if (activeTool === 'fill') isDrawing = false; }
 	}
 	function onEditMove(e: MouseEvent) {
-		if (!isDrawing || activeTool === 'fill') return;
+		if (isPlaying || !isDrawing || activeTool === 'fill') return;
 		const coord = editCoord(e);
 		if (coord) paintPixel(...coord);
 	}
@@ -1184,6 +1185,22 @@
 		debounceSave();
 	}
 
+	function togglePlay() {
+		if (!selectedTile || selectedTile.frames.length <= 1) return;
+		isPlaying = !isPlaying;
+	}
+
+	$effect(() => {
+		const tile = selectedTile;
+		if (!isPlaying || !tile || tile.frames.length <= 1) return;
+		const fps = tile.fps ?? 8;
+		const total = tile.frames.length;
+		const id = setInterval(() => {
+			frameIndex = (frameIndex + 1) % total;
+		}, 1000 / fps);
+		return () => clearInterval(id);
+	});
+
 	// ─── Persistence ──────────────────────────────────────────────────────────────
 	let saveHandle = 0;
 	function debounceSave() {
@@ -1267,6 +1284,7 @@
 		if (e.key === 'Escape' && editingSlot !== null) { closeSwatchEditor(); return; }
 		if (e.target instanceof HTMLInputElement) return;
 		if (e.key === 'r' || e.key === 'R') { rotateSelectedCell(); return; }
+		if (e.code === 'Space') { e.preventDefault(); togglePlay(); return; }
 		if (e.metaKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown') && selectedTile) {
 			e.preventDefault();
 			setTileFps((selectedTile.fps ?? 8) + (e.key === 'ArrowUp' ? 1 : -1));
@@ -1428,6 +1446,9 @@
 					<input type="number" min="1" max="60" value={selectedTile.fps ?? 8}
 						onchange={(e) => setTileFps(+(e.target as HTMLInputElement).value)} />
 				</label>
+				<button class="tool" class:active={isPlaying}
+					disabled={selectedTile.frames.length <= 1}
+					title="play/pause (space)" onclick={togglePlay}>{isPlaying ? '⏸' : '▶'}</button>
 			</div>
 
 			<!-- edit canvas -->
