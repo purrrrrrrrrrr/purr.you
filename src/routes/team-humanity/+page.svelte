@@ -27,6 +27,7 @@
 <svelte:head>
 	<title>team humanity</title>
 	<meta name="theme-color" content="#572b00" />
+	<link rel="icon" href="/team-humanity-favicon.svg" type="image/svg+xml" />
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link
 		href="https://fonts.googleapis.com/css2?family=Alexandria:wght@100..900&display=swap"

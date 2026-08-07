@@ -89,6 +89,9 @@ button {
 .question-box {
 	box-sizing: border-box;
 	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 120px;
 	background: #572b00;
 	color: #ffb870;
 	padding: 24px;
@@ -138,6 +141,11 @@ button {
 	height: 2px;
 	background: #000;
 	margin: 32px 0 24px;
+	padding: 10px 0;
+	background-clip: content-box;
+	box-sizing: content-box;
+	cursor: pointer;
+	touch-action: none;
 }
 
 .progress-dot {
@@ -148,6 +156,12 @@ button {
 	border-radius: 50%;
 	background: #572b00;
 	transform: translate(-50%, -50%);
+	cursor: grab;
+	touch-action: none;
+}
+
+.progress-track:active .progress-dot {
+	cursor: grabbing;
 }
 
 .nav-arrow {

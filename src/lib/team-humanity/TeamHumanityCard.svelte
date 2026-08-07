@@ -10,9 +10,13 @@
 	let progress = $state(0); // 0..1
 	let autoplayBlocked = $state(false);
 	let isPlaying = $state(false);
+	let dragging = $state(false);
 
 	/** @type {HTMLAudioElement} */
 	let audioEl;
+
+	/** @type {HTMLDivElement} */
+	let progressTrackEl;
 
 	let currentPerson = $derived(people[position.personIndex]);
 	let currentQuestion = $derived(questions[position.chapterIndex]);
@@ -77,9 +81,41 @@
 	}
 
 	function handleTimeUpdate() {
+		if (dragging) return;
 		if (audioEl.duration > 0) {
 			progress = audioEl.currentTime / audioEl.duration;
 		}
+	}
+
+	/** @param {PointerEvent} e */
+	function seekFromPointer(e) {
+		if (!progressTrackEl) return;
+		const rect = progressTrackEl.getBoundingClientRect();
+		const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+		progress = ratio;
+		if (audioEl.duration > 0) {
+			audioEl.currentTime = ratio * audioEl.duration;
+		}
+	}
+
+	/** @param {PointerEvent} e */
+	function handleProgressPointerDown(e) {
+		dragging = true;
+		/** @type {HTMLElement} */ (e.currentTarget).setPointerCapture(e.pointerId);
+		seekFromPointer(e);
+	}
+
+	/** @param {PointerEvent} e */
+	function handleProgressPointerMove(e) {
+		if (!dragging) return;
+		seekFromPointer(e);
+	}
+
+	/** @param {PointerEvent} e */
+	function handleProgressPointerUp(e) {
+		if (!dragging) return;
+		dragging = false;
+		/** @type {HTMLElement} */ (e.currentTarget).releasePointerCapture(e.pointerId);
 	}
 
 	function handleOverlayClick() {
@@ -163,7 +199,20 @@
 			{/each}
 		</div>
 
-		<div class="progress-track">
+		<div
+			class="progress-track"
+			bind:this={progressTrackEl}
+			role="slider"
+			tabindex="0"
+			aria-label="Seek"
+			aria-valuemin="0"
+			aria-valuemax="100"
+			aria-valuenow={Math.round(progress * 100)}
+			onpointerdown={handleProgressPointerDown}
+			onpointermove={handleProgressPointerMove}
+			onpointerup={handleProgressPointerUp}
+			onpointercancel={handleProgressPointerUp}
+		>
 			<div class="progress-dot" style="left: {progress * 100}%"></div>
 		</div>
 
