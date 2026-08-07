@@ -3,9 +3,21 @@
 	import { insertFrame, removeFrame, onionGhostIndices, ghostAlpha, clampFps, migrateTileFrames, type RawTile } from './animation';
 
 	// ─── Isometric constants ─────────────────────────────────────────────────────
-	const ISO_W = 64;
-	const ISO_H = 32;
-	const ISO_BOX = 40;
+	// ISO_W is recomputed on every level render so the room's iso-diamond bounding
+	// box always spans ROOM_FILL_RATIO of the level pane's width — ISO_H/ISO_BOX
+	// stay proportional to it (base ratios: H = W/2, BOX = W*40/64).
+	const ISO_W_BASE = 64;
+	const ROOM_FILL_RATIO = 0.9;
+	let ISO_W = $state(ISO_W_BASE);
+	let ISO_H = $derived(ISO_W / 2);
+	let ISO_BOX = $derived(ISO_W * 40 / 64);
+
+	// Solves (level.w + level.h) * tw/2 == cw * ROOM_FILL_RATIO for tw.
+	function computeIsoWidth(cw: number): number {
+		const span = level.w + level.h;
+		if (span <= 0 || cw <= 0) return ISO_W_BASE;
+		return (cw * ROOM_FILL_RATIO * 2) / span;
+	}
 
 	const SIZES = [
 		{ label: '8×8',   w: 8,  h: 8  },
@@ -544,7 +556,7 @@
 
 	// ─── Level rendering ──────────────────────────────────────────────────────────
 	function levelOffsets(cw: number, ch: number) {
-		const offX = cw / 2 - level.w * ISO_W / 2;
+		const offX = cw / 2 - level.w * ISO_W / 2 + cw * 0.4;
 		const offY = Math.max(
 			ISO_BOX + 8,
 			(ch - (level.w + level.h) * ISO_H / 2) / 2 + ISO_BOX
@@ -678,6 +690,7 @@
 		const ctx = levelCanvas.getContext('2d')!;
 		ctx.clearRect(0, 0, cw, ch);
 
+		ISO_W = computeIsoWidth(cw);
 		const { offX, offY } = levelOffsets(cw, ch);
 		const TW = ISO_W, TH = ISO_H;
 
