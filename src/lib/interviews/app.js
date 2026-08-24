@@ -1,7 +1,7 @@
 import { createTip } from './tip.js';
 import { createMachine } from './state.js';
 import { createCursor } from './cursor.js';
-import { createDrag } from './drag.js';
+import { createPlacementHand } from './drag.js';
 import { renderDatabunInSlot, renderPlaybackViewport, renderTransport } from './ui.js';
 import { createWaveform } from './waveform.js';
 import { loadDatabun } from './databun.js';
@@ -34,9 +34,14 @@ export function createInterviewsApp() {
   let chapterIndex = 0;
   /** @type {ReturnType<typeof parseVTT>} */
   let chapterCues = [];
+  let chapterContentReady = false;
   let firstChapterLoad = true;
-  /** @type {ReturnType<typeof createDrag> | null} */
-  let drag = null;
+  let chapterLoadId = 0;
+  let destroyed = false;
+  /** @type {ReturnType<typeof setTimeout>[]} */
+  const revealTimers = [];
+  /** @type {ReturnType<typeof createPlacementHand> | null} */
+  let placementHand = null;
   /** @type {(() => void) | null} */
   let unbindKeyboard = null;
   /** @type {ReturnType<typeof createWaveform> | null} */
@@ -74,10 +79,11 @@ export function createInterviewsApp() {
       cursor.unfreeze();
       renderDatabunInSlot(slotEl, currentDatabun.interviewee_name);
       /** @type {HTMLElement} */ (document.getElementById('load-btn')).classList.add('pulsing');
+      placementHand?.destroy();
+      placementHand = null;
     }
     if (state === 'loading') {
       /** @type {HTMLElement} */ (document.getElementById('load-btn')).classList.remove('pulsing');
-      cursor.detach();
       tip.hide();
     }
     if (state === 'playing') player.play();
@@ -96,6 +102,7 @@ export function createInterviewsApp() {
 
   function onDocumentClick() {
     if (machine.state === 'placing') machine.send('PLACE');
+    else if (!isDesktop() && machine.state === 'tipShown') machine.send('PLACE');
   }
   document.addEventListener('click', onDocumentClick);
 
@@ -104,39 +111,61 @@ export function createInterviewsApp() {
    * @param {number} [startAt]
    */
   async function loadChapter(idx, startAt = 0) {
+    const loadId = ++chapterLoadId;
+    chapterContentReady = false;
     chapterIndex = idx;
     const chapter = currentDatabun.chapters[idx];
     player.load(chapter);
-    const vttText = await fetch(chapter.subs_url).then(r => r.text());
+    const response = await fetch(chapter.subs_url);
+    if (!response.ok) throw new Error(`Failed to load subtitles ${chapter.subs_url}: ${response.status}`);
+    const vttText = await response.text();
+    if (loadId !== chapterLoadId || destroyed) return;
     chapterCues = parseVTT(vttText);
-    /** @type {HTMLElement} */ (document.getElementById('chapter-label')).textContent = chapter.title;
     const isFirstLoad = firstChapterLoad;
     if (isFirstLoad) {
       firstChapterLoad = false;
       renderPlaybackViewport(viewportEl);
     }
     const ctEl = /** @type {HTMLElement} */ (document.getElementById('chapter-title'));
-    ctEl.textContent = chapter.title;
+    ctEl.textContent = chapter.title || chapterCues[0]?.text || '';
     if (isFirstLoad) {
       await tip.ready();
+      if (loadId !== chapterLoadId || destroyed) return;
       tip.showText(currentDatabun.interviewee_name, () => {
+        if (destroyed) return;
         requestAnimationFrame(() => {
-          ctEl.classList.add('shown');
-          ctEl.addEventListener('transitionend', () => {
+          if (destroyed) return;
+          let subtitlesRevealed = false;
+          const revealSubtitles = () => {
+            if (subtitlesRevealed || destroyed) return;
+            subtitlesRevealed = true;
             const subsEl = /** @type {HTMLElement} */ (document.getElementById('subs'));
             subsEl.classList.add('visible');
             /** @type {HTMLElement} */ (document.querySelector('.tip-wrapper')).classList.add('line-shown');
-            subsEl.addEventListener('transitionend', () => {
+            let consoleRevealed = false;
+            const revealConsole = () => {
+              if (consoleRevealed || destroyed) return;
+              consoleRevealed = true;
               /** @type {HTMLElement} */ (document.getElementById('console-right')).classList.add('active');
-            }, { once: true });
-          }, { once: true });
+            };
+            subsEl.addEventListener('transitionend', revealConsole, { once: true });
+            revealTimers.push(setTimeout(revealConsole, 500));
+          };
+          ctEl.addEventListener('transitionend', revealSubtitles, { once: true });
+          ctEl.classList.add('shown');
+          revealTimers.push(setTimeout(revealSubtitles, 1100));
         });
       });
     }
+    await document.fonts?.ready;
+    if (loadId !== chapterLoadId || destroyed) return;
     if (karaoke) karaoke.destroy();
     karaoke = createKaraoke(/** @type {HTMLElement} */ (document.getElementById('subs-track')), () => player.currentTime);
     karaoke.render(chapterCues);
     player.seek(startAt);
+    chapterContentReady = true;
+    if (machine.state === 'loading' && player.ready) machine.send('READY');
+    waveform?.reset();
     updateTotalTime(startAt);
     if (machine.state === 'playing') {
       player.play();
@@ -147,9 +176,11 @@ export function createInterviewsApp() {
   function bindTransport() {
     /** @type {HTMLElement} */ (document.getElementById('t-back15')).onclick = () => {
       player.seek(seekBy({ currentTime: player.currentTime, chapterDuration: player.duration }, -15));
+      waveform?.reset();
     };
     /** @type {HTMLElement} */ (document.getElementById('t-fwd15')).onclick = () => {
       player.seek(seekBy({ currentTime: player.currentTime, chapterDuration: player.duration }, 15));
+      waveform?.reset();
     };
     /** @type {HTMLElement} */ (document.getElementById('t-play')).onclick = () => {
       if (machine.state === 'playing') { player.pause(); machine.send('TOGGLE_PLAY'); waveform?.pause(); }
@@ -179,7 +210,7 @@ export function createInterviewsApp() {
       }
     });
     player.onReady(() => {
-      if (machine.state === 'loading') machine.send('READY');
+      if (machine.state === 'loading' && chapterContentReady) machine.send('READY');
     });
   }
 
@@ -192,8 +223,8 @@ export function createInterviewsApp() {
     const waveformCanvas = /** @type {HTMLCanvasElement} */ (document.getElementById('timeline-waveform'));
     waveform = createWaveform(player.getElement(), waveformCanvas);
     const saved = loadProgress(currentDatabun.id);
-    await loadChapter(saved?.chapterIndex ?? 0, saved?.currentTime ?? 0);
     bindPlayback();
+    await loadChapter(saved?.chapterIndex ?? 0, saved?.currentTime ?? 0);
     unbindKeyboard = bindKeyboard(machine, {
       toggle: () => /** @type {HTMLElement} */ (document.getElementById('t-play')).click(),
       back15: () => /** @type {HTMLElement} */ (document.getElementById('t-back15')).click(),
@@ -210,7 +241,7 @@ export function createInterviewsApp() {
     currentDatabun = await loadDatabun('luna');
 
     if (!isDesktop()) {
-      drag = createDrag(app, slotEl, () => machine.send('PLACE'), (e) => debugPlacement.contains(e));
+      placementHand = createPlacementHand(app);
     }
 
     tipReadyTimer = setTimeout(() => machine.send('TIP_READY'), 1000);
@@ -218,7 +249,10 @@ export function createInterviewsApp() {
 
   return {
     destroy() {
+      destroyed = true;
+      chapterLoadId++;
       if (tipReadyTimer) clearTimeout(tipReadyTimer);
+      revealTimers.forEach(clearTimeout);
       unsubscribe();
       window.removeEventListener('pointermove', onPointerMove);
       document.removeEventListener('click', onDocumentClick);
@@ -226,7 +260,7 @@ export function createInterviewsApp() {
       unbindKeyboard?.();
       cursor.detach();
       debugPlacement.destroy();
-      drag?.destroy();
+      placementHand?.destroy();
       karaoke?.destroy();
       waveform?.destroy();
       player.destroy();

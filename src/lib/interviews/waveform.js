@@ -43,17 +43,34 @@ export function createWaveform(audioEl, canvas) {
     return peak / 128; // 0..1
   }
 
-  function draw() {
+  function renderFrame() {
     sizeCanvas();
     const w = canvas.width;
     const h = canvas.height;
-    history.unshift(sampleAmplitude());
-    if (history.length > w) history.length = w;
 
     ctx.clearRect(0, 0, w, h);
-    const styles = getComputedStyle(canvas);
-    ctx.fillStyle = styles.getPropertyValue('--fg').trim() || '#FFE600';
+    const fg = getComputedStyle(canvas).getPropertyValue('--fg').trim() || '#FFE600';
     const mid = h / 2;
+
+    // Placeholder wobble for the stretch not yet covered by real samples.
+    const emptyW = w - history.length;
+    if (emptyW > 0) {
+      ctx.save();
+      ctx.globalAlpha = 0.35;
+      ctx.strokeStyle = fg;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      const amp = h * 0.12;
+      const freq = 0.15;
+      for (let x = 0; x <= emptyW; x++) {
+        const y = mid + Math.sin(x * freq) * amp;
+        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    ctx.fillStyle = fg;
     for (let i = 0; i < history.length; i++) {
       const x = w - 1 - i;
       if (x < 0) break;
@@ -61,9 +78,16 @@ export function createWaveform(audioEl, canvas) {
       const barH = Math.max(1, amp * h);
       ctx.fillRect(x, mid - barH / 2, 1, barH);
     }
+  }
 
+  function draw() {
+    history.unshift(sampleAmplitude());
+    if (history.length > canvas.width) history.length = canvas.width;
+    renderFrame();
     rafId = requestAnimationFrame(draw);
   }
+
+  renderFrame();
 
   function start() {
     if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -75,10 +99,15 @@ export function createWaveform(audioEl, canvas) {
     rafId = null;
   }
 
+  function reset() {
+    history = [];
+    renderFrame();
+  }
+
   function destroy() {
     pause();
     audioCtx.close();
   }
 
-  return { start, pause, destroy };
+  return { start, pause, reset, destroy };
 }

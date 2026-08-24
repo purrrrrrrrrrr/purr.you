@@ -1,0 +1,45 @@
+- generic [ref=f1e3]:
+  - heading "Interview With a Human" [level=1] [ref=f1e4]: InterviewWith a Human
+  - generic [ref=f1e5]:
+    - generic [ref=f1e6]: LUNA
+    - generic [ref=f1e16]: Intro
+    - generic [ref=f1e18]:
+      - generic [ref=f1e20]:
+        - text: So, we're here with Frank Luna, great fella in Minca, and we'll have a little talk.
+        - generic [ref=f1e21]: So, we're here with Frank Luna, great fella in Minca, and we'll have a little talk.
+      - generic [ref=f1e23]:
+        - text: Frank, please introduce yourself as you like, as you prefer.
+        - generic [ref=f1e24]: Frank, please introduce yourself as you like, as you prefer.
+      - generic [ref=f1e25]:
+        - generic [ref=f1e26]:
+          - text: Hola, ¿qué tal? Yo soy Frank Luna. Soy cantante y cantautor nato de la ciudad
+          - generic [ref=f1e27]: Hola, ¿qué tal? Yo soy Frank Luna. Soy cantante y cantautor nato de la ciudad
+        - generic [ref=f1e28]:
+          - text: de Barranquilla.
+          - generic [ref=f1e29]: de Barranquilla.
+      - generic [ref=f1e31]:
+        - text: Tengo 34 años y actualmente estoy viviendo aquí en Minka.
+        - generic [ref=f1e32]: Tengo 34 años y actualmente estoy viviendo aquí en Minka.
+      - generic [ref=f1e33]:
+        - generic [ref=f1e34]:
+          - text: También soy filmógrafo, cineasta y bueno, estoy trabajando en un bonito
+          - generic [ref=f1e35]: También soy filmógrafo, cineasta y bueno, estoy trabajando en un bonito
+        - generic [ref=f1e36]:
+          - text: proyecto documental aquí en Minka.
+          - generic [ref=f1e37]: proyecto documental aquí en Minka.
+      - generic [ref=f1e39]:
+        - text: Y estoy aquí disfrutando de la buena música y de los ritmos naturales.
+        - generic [ref=f1e40]: Y estoy aquí disfrutando de la buena música y de los ritmos naturales.
+  - generic [ref=f1e8]:
+    - generic [ref=f1e9]:
+      - generic "Databun slot" [ref=f1e10]: LUNA
+      - button "Load" [active] [ref=f1e12]:
+        - generic [ref=f1e13]: LOAD
+    - generic:
+      - generic [ref=f1e41]: 0 (1150)
+      - generic [ref=f1e47]:
+        - button "-15 SEC" [ref=f1e48]
+        - button "PREV" [ref=f1e51]
+        - button "PLAY / PAUSE" [ref=f1e54]
+        - button "NEXT" [ref=f1e57]
+        - button "+15 SEC" [ref=f1e60]

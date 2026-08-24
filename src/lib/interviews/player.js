@@ -19,6 +19,7 @@ export function createPlayer() {
     pause() { audio.pause(); },
     /** @param {number} t */
     seek(t) { audio.currentTime = t; },
+    get ready() { return audio.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA; },
     get currentTime() { return audio.currentTime; },
     get duration() { return isFinite(audio.duration) ? audio.duration : 0; },
     /** @param {(t: number) => void} fn */

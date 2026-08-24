@@ -1,4 +1,7 @@
 import { escapeHtml } from './html.js';
+import { isMac } from './platform.js';
+
+const jumpKeyLabel = isMac ? '⌘' : 'Ctrl+';
 
 /**
  * @param {HTMLElement} slotEl
@@ -31,7 +34,6 @@ export function renderPlaybackViewport(viewportEl) {
 export function renderTransport(rightEl, databun) {
   rightEl.innerHTML = `
     <div class="timeline" id="timeline">
-      <div class="timeline-label" id="chapter-label">${escapeHtml(databun.chapters[0].title)}</div>
       <div class="timeline-bar" id="timeline-bar">
         <canvas class="timeline-waveform" id="timeline-waveform"></canvas>
         <div class="timeline-flat"></div>
@@ -43,11 +45,11 @@ export function renderTransport(rightEl, databun) {
     </div>
     <div class="control-buttons">
       <div class="transport">
-        <button class="hw-btn" id="t-back15" type="button"><span class="hw-btn-label">-15 SEC</span><span class="hw-btn-face"></span></button>
-        <button class="hw-btn" id="t-prev"   type="button"><span class="hw-btn-label">PREV</span><span class="hw-btn-face"></span></button>
-        <button class="hw-btn play-btn" id="t-play" type="button"><span class="hw-btn-label">PLAY / PAUSE</span><span class="hw-btn-face"></span></button>
-        <button class="hw-btn" id="t-next"   type="button"><span class="hw-btn-label">NEXT</span><span class="hw-btn-face"></span></button>
-        <button class="hw-btn" id="t-fwd15"  type="button"><span class="hw-btn-label">+15 SEC</span><span class="hw-btn-face"></span></button>
+        <div class="hw-btn-wrap"><button class="hw-btn" id="t-back15" type="button"><span class="hw-btn-label">-15 SEC</span><span class="hw-btn-face"></span></button><span class="hw-btn-shortcut">←</span></div>
+        <div class="hw-btn-wrap"><button class="hw-btn" id="t-prev"   type="button"><span class="hw-btn-label">PREV</span><span class="hw-btn-face"></span></button><span class="hw-btn-shortcut">${jumpKeyLabel}←</span></div>
+        <div class="hw-btn-wrap"><button class="hw-btn play-btn" id="t-play" type="button"><span class="hw-btn-label">PLAY / PAUSE</span><span class="hw-btn-face"></span></button><span class="hw-btn-shortcut">␣</span></div>
+        <div class="hw-btn-wrap"><button class="hw-btn" id="t-next"   type="button"><span class="hw-btn-label">NEXT</span><span class="hw-btn-face"></span></button><span class="hw-btn-shortcut">${jumpKeyLabel}→</span></div>
+        <div class="hw-btn-wrap"><button class="hw-btn" id="t-fwd15"  type="button"><span class="hw-btn-label">+15 SEC</span><span class="hw-btn-face"></span></button><span class="hw-btn-shortcut">→</span></div>
       </div>
     </div>
   `;

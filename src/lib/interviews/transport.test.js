@@ -14,6 +14,9 @@ describe('seekBy', () => {
   it('clamps backward seek at chapter start', () => {
     expect(seekBy({ currentTime: 5, chapterDuration: 60 }, -15)).toBe(0);
   });
+  it('does not snap to 0 when chapter duration is unknown', () => {
+    expect(seekBy({ currentTime: 5, chapterDuration: 0 }, 15)).toBe(20);
+  });
 });
 
 describe('prevChapter', () => {

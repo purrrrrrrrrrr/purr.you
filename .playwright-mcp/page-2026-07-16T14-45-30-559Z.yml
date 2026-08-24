@@ -1,7 +1,0 @@
-- generic [ref=e3]:
-  - heading "Interview With a Human" [level=1] [ref=e4]: InterviewWith a Human
-  - generic [ref=e5]: INSERT DATABUN
-  - generic [ref=e9]:
-    - generic "Databun slot" [ref=e10]: DATABUN
-    - button "Load" [ref=e12]:
-      - generic [ref=e13]: LOAD

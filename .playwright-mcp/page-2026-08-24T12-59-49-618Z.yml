@@ -1,0 +1,8 @@
+- generic [ref=e3]:
+  - heading "CHESS CLASH" [level=1] [ref=e4]
+  - button "Host Game" [ref=e5] [cursor=pointer]
+  - button "Join Game" [ref=e6] [cursor=pointer]
+  - button "Play Local" [ref=e7] [cursor=pointer]
+  - button "Realm Map" [ref=e8] [cursor=pointer]
+  - button "Config Settings" [ref=e9] [cursor=pointer]
+  - button "RoboLand" [ref=e10] [cursor=pointer]

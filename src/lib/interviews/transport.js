@@ -5,7 +5,7 @@
 export function seekBy({ currentTime, chapterDuration }, delta) {
   const target = currentTime + delta;
   if (target < 0) return 0;
-  if (target > chapterDuration) return chapterDuration;
+  if (chapterDuration > 0 && target > chapterDuration) return chapterDuration;
   return target;
 }
 

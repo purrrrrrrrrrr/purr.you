@@ -1,0 +1,37 @@
+- generic [ref=f4e3]:
+  - heading "Interview With a Human" [level=1] [ref=f4e4]: InterviewWith a Human
+  - generic [ref=f4e5]:
+    - generic [ref=f4e6]: LUNA
+    - generic [ref=f4e16]: Intro
+    - generic [ref=f4e18]:
+      - generic [ref=f4e19]:
+        - text: So, we're here with Frank Luna, great fella in Minca, and we'll have a little talk.
+        - generic [ref=f4e20]: So, we're here with Frank Luna, great fella in Minca, and we'll have a little talk.
+      - generic [ref=f4e21]:
+        - text: Frank, please introduce yourself as you like, as you prefer.
+        - generic [ref=f4e22]: Frank, please introduce yourself as you like, as you prefer.
+      - generic [ref=f4e23]:
+        - text: Hola, ¿qué tal? Yo soy Frank Luna. Soy cantante y cantautor nato de la ciudad de Barranquilla.
+        - generic [ref=f4e24]: Hola, ¿qué tal? Yo soy Frank Luna. Soy cantante y cantautor nato de la ciudad de Barranquilla.
+      - generic [ref=f4e25]:
+        - text: Tengo 34 años y actualmente estoy viviendo aquí en Minka.
+        - generic [ref=f4e26]: Tengo 34 años y actualmente estoy viviendo aquí en Minka.
+      - generic [ref=f4e27]:
+        - text: También soy filmógrafo, cineasta y bueno, estoy trabajando en un bonito proyecto documental aquí en Minka.
+        - generic [ref=f4e28]: También soy filmógrafo, cineasta y bueno, estoy trabajando en un bonito proyecto documental aquí en Minka.
+      - generic [ref=f4e29]:
+        - text: Y estoy aquí disfrutando de la buena música y de los ritmos naturales.
+        - generic [ref=f4e30]: Y estoy aquí disfrutando de la buena música y de los ritmos naturales.
+  - generic [ref=f4e8]:
+    - generic [ref=f4e9]:
+      - generic "Databun slot" [ref=f4e10]: LUNA
+      - button "Load" [active] [ref=f4e12]:
+        - generic [ref=f4e13]: LOAD
+    - generic:
+      - generic [ref=f4e31]: 0 (1150)
+      - generic [ref=f4e37]:
+        - button "-15 SEC" [ref=f4e38]
+        - button "PREV" [ref=f4e41]
+        - button "PLAY / PAUSE" [ref=f4e44]
+        - button "NEXT" [ref=f4e47]
+        - button "+15 SEC" [ref=f4e50]

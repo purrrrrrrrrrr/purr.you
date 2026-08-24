@@ -1,0 +1,37 @@
+- generic [ref=e3]:
+  - heading "Interview With a Human" [level=1] [ref=e4]: InterviewWith a Human
+  - generic [ref=e5]:
+    - generic [ref=e6]: LUNA
+    - generic [ref=e16]: Intro
+    - generic [ref=e18]:
+      - generic [ref=e19]:
+        - text: So, we're here with Frank Luna, great fella in Minca, and we'll have a little talk.
+        - generic [ref=e20]: So, we're here with Frank Luna, great fella in Minca, and we'll have a little talk.
+      - generic [ref=e21]:
+        - text: Frank, please introduce yourself as you like, as you prefer.
+        - generic [ref=e22]: Frank, please introduce yourself as you like, as you prefer.
+      - generic [ref=e23]:
+        - text: Hola, ¿qué tal? Yo soy Frank Luna. Soy cantante y cantautor nato de la ciudad de Barranquilla.
+        - generic [ref=e24]: Hola, ¿qué tal? Yo soy Frank Luna. Soy cantante y cantautor nato de la ciudad de Barranquilla.
+      - generic [ref=e25]:
+        - text: Tengo 34 años y actualmente estoy viviendo aquí en Minka.
+        - generic [ref=e26]: Tengo 34 años y actualmente estoy viviendo aquí en Minka.
+      - generic [ref=e27]:
+        - text: También soy filmógrafo, cineasta y bueno, estoy trabajando en un bonito proyecto documental aquí en Minka.
+        - generic [ref=e28]: También soy filmógrafo, cineasta y bueno, estoy trabajando en un bonito proyecto documental aquí en Minka.
+      - generic [ref=e29]:
+        - text: Y estoy aquí disfrutando de la buena música y de los ritmos naturales.
+        - generic [ref=e30]: Y estoy aquí disfrutando de la buena música y de los ritmos naturales.
+  - generic [ref=e8]:
+    - generic [ref=e9]:
+      - generic "Databun slot" [ref=e10]: LUNA
+      - button "Load" [active] [ref=e12]:
+        - generic [ref=e13]: LOAD
+    - generic:
+      - generic [ref=e31]: 0 (1150)
+      - generic [ref=e37]:
+        - button "-15 SEC" [ref=e38]
+        - button "PREV" [ref=e41]
+        - button "PLAY / PAUSE" [ref=e44]
+        - button "NEXT" [ref=e47]
+        - button "+15 SEC" [ref=e50]

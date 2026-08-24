@@ -1,0 +1,5 @@
+[     526ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://localhost:7778/interviews:0
+[     705ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:7778/favicon.ico:0
+[   25874ms] TypeError: Cannot set properties of null (setting 'textContent')
+    at loadChapter (http://localhost:7778/src/lib/interviews/app.js:115:87)
+    at async HTMLButtonElement.onLoadClick (http://localhost:7778/src/lib/interviews/app.js:198:5)

@@ -1,8 +1,8 @@
 const MOBILE_MAX = 899;
 
 const COPY = {
-  insert: { desktop: 'INSERT DATABUN', mobile: 'DRAG AND INSERT DATABUN' },
-  click:  { desktop: 'CLICK TO PLACE', mobile: 'DRAG AND INSERT DATABUN' },
+  insert: { desktop: 'INSERT DATABUN', mobile: 'TAP TO INSERT DATABUN' },
+  click:  { desktop: 'CLICK TO PLACE', mobile: 'TAP TO INSERT DATABUN' },
   load:   { desktop: 'LOAD DATA',      mobile: 'LOAD DATA' }
 };
 

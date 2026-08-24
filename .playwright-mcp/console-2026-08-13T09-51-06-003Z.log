@@ -1,0 +1,5 @@
+[      83ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://localhost:7778/interviews:0
+[   20843ms] [LOG] [dbg] keydown ArrowRight state= paused @ http://localhost:7778/src/lib/interviews/keyboard.js?t=1786614595701:7
+[   20843ms] [LOG] [dbg] fwd15 @ http://localhost:7778/src/lib/interviews/keyboard.js?t=1786614595701:12
+[   20844ms] [LOG] [dbg] fwd15 click, currentTime= 0 duration= 42.24 target= 15 @ http://localhost:7778/src/lib/interviews/app.js?t=1786614655233:155
+[   20844ms] [LOG] [dbg] after seek, currentTime= 0 @ http://localhost:7778/src/lib/interviews/app.js?t=1786614655233:157
