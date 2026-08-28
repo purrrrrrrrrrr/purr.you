@@ -475,7 +475,7 @@ body {
   transition: clip-path 1s ease-out;
 }
 
-.chapter-title.shown { clip-path: inset(0 0% 0 0); }
+.chapter-title.shown { clip-path: inset(0 0% -1px 0); }
 
 /* Subtitles */
 .subs {
@@ -489,7 +489,6 @@ body {
 .subs.visible { opacity: 1; }
 
 .subs-track {
-  --cue-fill-tail: 20px;
   display: grid;
   gap: 0;
   font-size: 1rem;
@@ -506,7 +505,7 @@ body {
 .cue-line {
   position: relative;
   display: block;
-  width: max-content;
+  width: 100%;
   font-weight: 400;
   padding-left: 1rem;
 }
@@ -517,15 +516,9 @@ body {
 
 .cue-fill {
   position: absolute;
-  inset: -1px auto -1px 0;
-  width: calc(100% + var(--cue-fill-tail));
+  inset: -1px 0;
   overflow: hidden;
-  background: linear-gradient(
-    to right,
-    var(--fg) 0,
-    var(--fg) calc(100% - var(--cue-fill-tail)),
-    transparent 100%
-  );
+  background: var(--fg);
   color: var(--bg);
   padding-left: 1rem;
   margin: 0;

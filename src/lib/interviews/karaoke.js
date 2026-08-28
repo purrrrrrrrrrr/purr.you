@@ -9,7 +9,7 @@ export function createKaraoke(containerEl, getTime) {
   let cues = [];
   /** @type {HTMLElement[]} */
   let cueEls = [];
-  /** @type {{ el: HTMLElement, start: number, end: number }[][]} */
+  /** @type {{ el: HTMLElement, start: number, end: number, textEnd: number }[][]} */
   let lineGroups = [];
   let activeCueIdx = -1;
   /** @type {number | null} */
@@ -23,7 +23,7 @@ export function createKaraoke(containerEl, getTime) {
   /**
    * Groups a cue's words by their rendered line (via offsetTop) so each visual
    * line can fill independently, splitting the cue's duration between lines
-   * proportionally by rendered width plus the fixed fill tail.
+   * proportionally by rendered text width.
    * @param {{ start: number, end: number, text: string }} cue
    * @param {HTMLElement} wordsEl
    */
@@ -42,10 +42,11 @@ export function createKaraoke(containerEl, getTime) {
       line.left = Math.min(line.left, w.offsetLeft);
       line.right = Math.max(line.right, w.offsetLeft + w.offsetWidth);
     }
-    const tail = Number.parseFloat(getComputedStyle(containerEl).getPropertyValue('--cue-fill-tail')) || 20;
+    const availableWidth = containerEl.clientWidth || 1;
     const lines = lineWords.map(line => ({
       text: line.words.join(' '),
-      width: line.right - line.left + tail
+      width: line.right - line.left,
+      textEnd: Math.min(1, Math.max(0, line.right / availableWidth))
     }));
     const totalWidth = lines.reduce((sum, line) => sum + line.width, 0) || 1;
     const duration = cue.end - cue.start;
@@ -53,7 +54,7 @@ export function createKaraoke(containerEl, getTime) {
     return lines.map(line => {
       const start = t;
       t += (line.width / totalWidth) * duration;
-      return { text: line.text, start, end: t };
+      return { text: line.text, start, end: t, textEnd: line.textEnd };
     });
   }
 
@@ -76,7 +77,7 @@ export function createKaraoke(containerEl, getTime) {
       <div class="cue" data-cue="${i}">${measured[i].map(line => `
         <div class="cue-line">
           <span class="cue-base">${escapeHtml(line.text)}</span>
-          <span class="cue-fill" style="clip-path: inset(0 100% 0 0)">${escapeHtml(line.text)}</span>
+          <span class="cue-fill" style="clip-path: inset(0 100% -1px 0)">${escapeHtml(line.text)}</span>
         </div>
       `).join('')}</div>
     `).join('');
@@ -94,17 +95,35 @@ export function createKaraoke(containerEl, getTime) {
   /** @param {number} currentTime */
   function update(currentTime) {
     const idx = cues.findIndex(c => currentTime >= c.start && currentTime < c.end);
-    if (idx === -1) return;
+    if (idx === -1) {
+      if (activeCueIdx !== -1 && currentTime >= cues[activeCueIdx].end) {
+        for (const line of lineGroups[activeCueIdx]) {
+          line.el.style.clipPath = 'inset(0 0% 0 0)';
+        }
+      }
+      return;
+    }
     if (idx !== activeCueIdx) {
+      if (activeCueIdx !== -1 && idx > activeCueIdx) {
+        for (const line of lineGroups[activeCueIdx]) {
+          line.el.style.clipPath = 'inset(0 0% 0 0)';
+        }
+      }
       activeCueIdx = idx;
       cueEls.forEach((el, i) => el.classList.toggle('active', i === idx));
       const dy = cueEls[idx].offsetTop - cueEls[0].offsetTop;
       containerEl.style.transform = `translateY(-${dy}px)`;
     }
     for (const line of lineGroups[idx]) {
-      const pct = currentTime < line.start ? 0
-        : currentTime >= line.end ? 100
-        : ((currentTime - line.start) / (line.end - line.start)) * 100;
+      const progress = currentTime < line.start ? 0
+        : currentTime >= line.end ? 1
+        : (currentTime - line.start) / (line.end - line.start);
+      const textPhaseEnd = 0.8;
+      const tailProgress = Math.max(0, (progress - textPhaseEnd) / (1 - textPhaseEnd));
+      const acceleratedTail = 0.2 * tailProgress + 0.8 * tailProgress * tailProgress;
+      const pct = progress <= textPhaseEnd
+        ? (progress / textPhaseEnd) * line.textEnd * 100
+        : (line.textEnd + (1 - line.textEnd) * acceleratedTail) * 100;
       line.el.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
     }
   }
