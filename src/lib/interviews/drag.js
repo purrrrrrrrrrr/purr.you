@@ -7,9 +7,10 @@ export function createPlacementHand(rootEl) {
   el.innerHTML = PLACING;
   rootEl.appendChild(el);
 
-  const v = /** @type {HTMLElement} */ (rootEl.querySelector('.viewport')).getBoundingClientRect();
-  el.style.left = `${v.left + v.width / 2 - 90}px`;
-  el.style.top  = `${v.top + v.height / 2 - 70}px`;
+  const slot = /** @type {HTMLElement} */ (rootEl.querySelector('.slot')).getBoundingClientRect();
+  const hand = el.getBoundingClientRect();
+  el.style.left = '50px';
+  el.style.top  = `${slot.top + (slot.height - hand.height) / 2 - 48}px`;
 
   return { destroy() { el.remove(); } };
 }

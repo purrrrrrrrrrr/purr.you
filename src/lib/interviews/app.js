@@ -343,6 +343,7 @@ export function createInterviewsApp() {
   async function onLoadClick() {
     if (machine.state !== 'placed') return;
     machine.send('LOAD_PRESSED');
+    document.getElementById('console')?.classList.add('playback-loaded');
     const consoleRight = /** @type {HTMLElement} */ (document.getElementById('console-right'));
     renderTransport(consoleRight, currentDatabun);
     bindTransport();

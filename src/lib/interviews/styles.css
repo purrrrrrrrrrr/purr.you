@@ -115,7 +115,9 @@ body {
   border-bottom-color: var(--bg);
 }
 
-.tip.fading { opacity: 0; }
+.tip.fading {
+  opacity: 0;
+}
 
 .tip.active {
   background: var(--bg-tip-active);
@@ -127,8 +129,15 @@ body {
 }
 
 @keyframes console-grow {
-  from { max-height: 0; opacity: 0; }
-  to   { max-height: 600px; opacity: 1; }
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+
+  to {
+    max-height: 600px;
+    opacity: 1;
+  }
 }
 
 .console-right {
@@ -171,12 +180,12 @@ body {
 }
 
 .slot-label {
-    font-size: 9px;
-    letter-spacing: 0.1em;
-    padding: 8px 2px;
-    border-top: 1px solid;
-    width: 100%;
-    text-align: center;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  padding: 8px 2px;
+  border-top: 1px solid;
+  width: 100%;
+  text-align: center;
 
 }
 
@@ -197,7 +206,7 @@ body {
 .hw-btn {
   position: relative;
   width: 93px;
-    height: 97px;
+  height: 97px;
   background: transparent;
   border: 1px solid var(--border);
   border-radius: 2px;
@@ -252,8 +261,15 @@ body {
 }
 
 @keyframes btn-pulse {
-  0%, 100% { background: color-mix(in srgb, var(--fg) 30%, transparent); }
-  50%       { background: var(--fg); }
+
+  0%,
+  100% {
+    background: color-mix(in srgb, var(--fg) 30%, transparent);
+  }
+
+  50% {
+    background: var(--fg);
+  }
 }
 
 .hw-btn.pulsing .hw-btn-face {
@@ -324,7 +340,9 @@ body {
 
 /* Cursor */
 @media (max-width: 899px) {
-  .hand-cursor { display: none !important; }
+  .hand-cursor {
+    display: none !important;
+  }
 }
 
 @media (min-width: 900px) {
@@ -355,8 +373,8 @@ body {
 /* Mobile placement hand */
 .databun-drag {
   position: fixed;
-  width: 180px;
-  height: 140px;
+  width: 395px;
+  height: 308px;
   color: var(--fg);
   z-index: 1000;
 }
@@ -377,7 +395,10 @@ body {
   .console {
     grid-template-columns: 1fr;
   }
-  .console-right { order: -1; }
+
+  .console-right {
+    order: -1;
+  }
 }
 
 /* Playback view */
@@ -445,7 +466,7 @@ body {
 
 .play-chapter-title {
   background: var(--bg-tip-active);
-  color: var(--fg-tip-active);  
+  color: var(--fg-tip-active);
   display: inline-block;
   padding: 0 2rem;
   font-weight: 500;
@@ -513,8 +534,13 @@ body {
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .console-right.active .control-buttons {
@@ -539,7 +565,7 @@ body {
 /* Chapter title */
 .chapter-title {
   flex: 0 0 auto;
-  padding:  0 1.5rem;
+  padding: 0 1.5rem;
   font-size: 1rem;
   line-height: 4rem;
   font-weight: 500;
@@ -551,7 +577,9 @@ body {
   transition: clip-path 1s ease-out;
 }
 
-.chapter-title.shown { clip-path: inset(0 0% -1px 0); }
+.chapter-title.shown {
+  clip-path: inset(0 0% -1px 0);
+}
 
 .subtitle-languages {
   display: flex;
@@ -585,16 +613,16 @@ body {
   border-left: 0;
 }
 
-.subtitle-languages input:checked + label {
+.subtitle-languages input:checked+label {
   background: var(--fg);
   color: var(--bg);
 }
 
-.subtitle-languages input:not(:checked) + label:hover {
+.subtitle-languages input:not(:checked)+label:hover {
   background: color-mix(in srgb, var(--fg) 10%, transparent);
 }
 
-.subtitle-languages input:focus-visible + label {
+.subtitle-languages input:focus-visible+label {
   outline: 2px solid orange;
   outline-offset: -2px;
 }
@@ -608,7 +636,9 @@ body {
   transition: opacity 0.4s ease-out;
 }
 
-.subs.visible { opacity: 1; }
+.subs.visible {
+  opacity: 1;
+}
 
 .subs-track {
   display: grid;
@@ -647,4 +677,188 @@ body {
   padding-top: 1px;
   margin: 0;
   white-space: nowrap;
+}
+
+/* Phone layout — tuned for a 375px viewport. */
+@media (max-width: 480px) {
+  :root {
+    --databun-height: 86px;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+
+  #app {
+    grid-template-rows: auto 290px auto;
+    width: 100%;
+    padding: 20px 16px 24px;
+  }
+
+  .page-header {
+    align-items: flex-end;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .title {
+    font-size: 1.35rem;
+    line-height: 1.25;
+  }
+
+  .subtitle-languages label {
+    min-width: 2.6rem;
+    padding: 0.35rem 0.45rem;
+    font-size: 0.75rem;
+  }
+
+  .viewport {
+    padding-top: 42px;
+  }
+
+  .tip {
+    height: 42px;
+    padding: 0 1rem;
+    font-size: 0.8rem;
+  }
+
+  .tip-wrapper {
+    line-height: 42px;
+  }
+
+  .chapter-title {
+    padding: 0 0.75rem;
+    font-size: 0.8rem;
+    line-height: 48px;
+    letter-spacing: 0.06em;
+  }
+
+  .subs-track {
+    font-size: 0.9rem;
+    line-height: 40px;
+  }
+
+  .cue-measure {
+    padding: 0 0.75rem;
+  }
+
+  .cue-line,
+  .cue-fill {
+    padding-left: 0.75rem;
+  }
+
+  .console {
+    height: auto;
+    min-height: 106px;
+    margin-top: 16px;
+    gap: 16px;
+    padding: 16px 12px;
+  }
+
+  .console-left {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    height: 97px;
+    padding: 0;
+  }
+
+  .slot {
+    flex: 0 0 93px;
+    width: 93px;
+    height: var(--databun-height);
+  }
+
+  .console-left>.hw-btn {
+    flex: 0 0 93px;
+    width: 93px;
+    height: 97px;
+  }
+
+  .console-right {
+    min-width: 0;
+  }
+
+  .console.playback-loaded .console-left {
+    display: none;
+  }
+
+  .console.playback-loaded .volume-wheel {
+    right: auto;
+    left: 0;
+    width: 73px;
+    height: 73px;
+  }
+
+  .console.playback-loaded .timeline {
+    padding-right: 0;
+    padding-left: 89px;
+  }
+
+  .console.playback-loaded .volume-wheel-indicator {
+    inset: 6px;
+  }
+
+  .console.playback-loaded .volume-wheel-indicator::before {
+    height: 11px;
+  }
+
+  .playback-panel {
+    padding: 12px 0 0;
+  }
+
+  .timeline {
+    gap: 12px;
+    padding-right: calc(var(--databun-height) + 12px);
+  }
+
+  .timeline-bar {
+    height: 30px;
+  }
+
+  .timeline-times {
+    font-size: 0.72rem;
+    text-align: left;
+  }
+
+  .volume-wheel-indicator {
+    inset: 7px;
+  }
+
+  .volume-wheel-indicator::before {
+    height: 13px;
+  }
+
+  .control-buttons {
+    padding: 8px 0 0;
+  }
+
+  .transport {
+    grid-template-columns: 1fr 1fr 1.35fr 1fr 1fr;
+    gap: 4px;
+    padding: 8px 0 0;
+  }
+
+  .transport .hw-btn {
+    min-width: 0;
+    height: 96px;
+  }
+
+  .transport .hw-btn-label {
+    min-height: 27px;
+    padding: 0.3rem 0.1rem;
+    font-size: 0.52rem;
+    letter-spacing: 0.03em;
+  }
+
+  .transport .hw-btn-face {
+    margin: 5px;
+  }
+
+  .hw-btn-shortcut {
+    display: none;
+  }
+
 }

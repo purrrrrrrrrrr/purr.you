@@ -3,7 +3,7 @@ const MOBILE_MAX = 899;
 const COPY = {
   insert: { desktop: 'INSERT DATABUN', mobile: 'TAP TO INSERT DATABUN' },
   click:  { desktop: 'CLICK TO PLACE', mobile: 'TAP TO INSERT DATABUN' },
-  load:   { desktop: 'LOAD DATA',      mobile: 'LOAD DATA' }
+  load:   { desktop: 'LOAD DATA',      mobile: 'TAP TO LOAD DATABUN' }
 };
 
 function variant() {
