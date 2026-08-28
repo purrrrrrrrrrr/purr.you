@@ -5,6 +5,7 @@
   --fg-tip-active: #002107;
   --border: #FFE600;
   --font-sans: 'Alexandria', sans-serif;
+  --databun-height: 86px;
 }
 
 * {
@@ -48,7 +49,15 @@ body {
   font-weight: 500;
   line-height: 1.4;
   letter-spacing: 0.01em;
-  margin: 0 0 36px;
+  margin: 0;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 36px;
 }
 
 .viewport {
@@ -123,6 +132,7 @@ body {
 }
 
 .console-right {
+  position: relative;
   align-self: stretch;
   overflow: hidden;
   max-height: 0;
@@ -150,7 +160,7 @@ body {
   position: relative;
 
   width: 93px;
-  height: 86px;
+  height: var(--databun-height);
   border: 1px solid var(--border);
   border-radius: 50px 50px 0 0;
   display: flex;
@@ -371,6 +381,68 @@ body {
 }
 
 /* Playback view */
+.playback-panel {
+  height: 100%;
+  padding: 16px 1rem 0;
+}
+
+.playback-main {
+  min-width: 0;
+}
+
+.volume-wheel {
+  --volume-angle: 135deg;
+  display: grid;
+  place-items: center;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  width: var(--databun-height);
+  height: var(--databun-height);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--fg) 10%, transparent);
+  color: var(--fg);
+  cursor: none;
+  touch-action: none;
+  user-select: none;
+}
+
+.volume-wheel.dragging {
+  background: color-mix(in srgb, var(--fg) 18%, transparent);
+}
+
+.volume-wheel-indicator {
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  transform: rotate(var(--volume-angle));
+  transition: transform 80ms ease-out;
+}
+
+.volume-wheel.dragging .volume-wheel-indicator {
+  transition: none;
+}
+
+.volume-wheel-indicator::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 3px;
+  height: 15px;
+  border-radius: 2px;
+  background: var(--fg);
+  transform: translateX(-50%);
+}
+
+.volume-label {
+  position: relative;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+}
+
 .play-chapter-title {
   background: var(--bg-tip-active);
   color: var(--fg-tip-active);  
@@ -382,10 +454,10 @@ body {
 }
 
 .timeline {
-  padding: 0 1rem;
+  padding: 0 calc(var(--databun-height) + 1rem) 0 0;
   display: grid;
   grid-template-rows: auto auto auto;
-  gap: 0.4rem;
+  gap: 16px;
 }
 
 
@@ -431,8 +503,12 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+#total-time {
+  padding-left: 109px
+}
+
 .control-buttons {
-  padding: 3rem 1rem 1rem 1rem;
+  padding: 13px 0 1rem;
   width: 100%;
 }
 
@@ -477,6 +553,52 @@ body {
 
 .chapter-title.shown { clip-path: inset(0 0% -1px 0); }
 
+.subtitle-languages {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--fg);
+  cursor: none;
+}
+
+.subtitle-languages input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.subtitle-languages label {
+  min-width: 3.12rem;
+  padding: 0.39rem 0.585rem;
+  border-left: 1px solid var(--fg);
+  color: var(--fg);
+  font-size: 0.845rem;
+  line-height: 1;
+  text-align: center;
+  cursor: none;
+  transition: background-color 120ms ease-out;
+}
+
+.subtitle-languages label:first-of-type {
+  border-left: 0;
+}
+
+.subtitle-languages input:checked + label {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.subtitle-languages input:not(:checked) + label:hover {
+  background: color-mix(in srgb, var(--fg) 10%, transparent);
+}
+
+.subtitle-languages input:focus-visible + label {
+  outline: 2px solid orange;
+  outline-offset: -2px;
+}
+
 /* Subtitles */
 .subs {
   flex: 1 1 auto;
@@ -512,6 +634,7 @@ body {
 
 .cue-base {
   color: color-mix(in srgb, var(--fg) 100%, transparent);
+  clip-path: inset(0 0% -1px 0);
 }
 
 .cue-fill {
@@ -521,6 +644,7 @@ body {
   background: var(--fg);
   color: var(--bg);
   padding-left: 1rem;
+  padding-top: 1px;
   margin: 0;
   white-space: nowrap;
 }

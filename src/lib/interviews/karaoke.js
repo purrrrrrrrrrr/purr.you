@@ -12,6 +12,7 @@ export function createKaraoke(containerEl, getTime) {
   /** @type {{ el: HTMLElement, start: number, end: number, textEnd: number }[][]} */
   let lineGroups = [];
   let activeCueIdx = -1;
+  let activeLineIdx = 0;
   /** @type {number | null} */
   let rafId = null;
 
@@ -19,6 +20,35 @@ export function createKaraoke(containerEl, getTime) {
     update(getTime());
     rafId = requestAnimationFrame(tick);
   }
+
+  /**
+   * Center the line currently being filled within the visible subtitle area.
+   * @param {number} idx
+   * @param {number} [lineIdx]
+   */
+  function positionActiveCue(idx, lineIdx = 0) {
+    const chapterLineIdx = lineGroups
+      .slice(0, idx)
+      .reduce((count, lines) => count + lines.length, 0) + lineIdx;
+    if (chapterLineIdx < 2) {
+      containerEl.style.transform = 'translateY(0)';
+      return;
+    }
+    const firstRow = /** @type {HTMLElement | null} */ (cueEls[idx]?.querySelector('.cue-line'));
+    const rowHeight = firstRow?.offsetHeight || 0;
+    const cueOffset = cueEls[idx].offsetTop - cueEls[0].offsetTop;
+    const lineOffset = cueOffset + lineIdx * rowHeight;
+    const visibleHeight = containerEl.parentElement?.clientHeight || rowHeight;
+    const centeredRowOffset = Math.max(0, (visibleHeight - rowHeight) / 2);
+    const dy = lineOffset - centeredRowOffset;
+    containerEl.style.transform = `translateY(${-dy}px)`;
+  }
+
+  function onResize() {
+    if (activeCueIdx !== -1) positionActiveCue(activeCueIdx, activeLineIdx);
+  }
+
+  window.addEventListener('resize', onResize);
 
   /**
    * Groups a cue's words by their rendered line (via offsetTop) so each visual
@@ -62,6 +92,7 @@ export function createKaraoke(containerEl, getTime) {
   function render(cuesNext) {
     cues = cuesNext;
     activeCueIdx = -1;
+    activeLineIdx = 0;
 
     containerEl.innerHTML = cues.map((c, i) => `
       <div class="cue" data-cue="${i}"><div class="cue-measure"><span class="cue-words">${
@@ -110,9 +141,14 @@ export function createKaraoke(containerEl, getTime) {
         }
       }
       activeCueIdx = idx;
+      activeLineIdx = 0;
       cueEls.forEach((el, i) => el.classList.toggle('active', i === idx));
-      const dy = cueEls[idx].offsetTop - cueEls[0].offsetTop;
-      containerEl.style.transform = `translateY(-${dy}px)`;
+      positionActiveCue(idx);
+    }
+    const currentLineIdx = Math.max(0, lineGroups[idx].findIndex(line => currentTime < line.end));
+    if (currentLineIdx !== activeLineIdx) {
+      activeLineIdx = currentLineIdx;
+      positionActiveCue(idx, activeLineIdx);
     }
     for (const line of lineGroups[idx]) {
       const progress = currentTime < line.start ? 0
@@ -130,6 +166,7 @@ export function createKaraoke(containerEl, getTime) {
 
   function destroy() {
     if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    window.removeEventListener('resize', onResize);
   }
 
   return { render, destroy };

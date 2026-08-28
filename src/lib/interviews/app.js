@@ -35,6 +35,7 @@ export function createInterviewsApp() {
   /** @type {ReturnType<typeof parseVTT>} */
   let chapterCues = [];
   let chapterContentReady = false;
+  let subtitleLanguage = '';
   let firstChapterLoad = true;
   let chapterLoadId = 0;
   let destroyed = false;
@@ -47,6 +48,89 @@ export function createInterviewsApp() {
   /** @type {ReturnType<typeof createWaveform> | null} */
   let waveform = null;
 
+  /** @param {any} chapter */
+  function getSubtitleUrl(chapter) {
+    if (typeof chapter.subs_url === 'string') return chapter.subs_url;
+    if (chapter.subs_url?.[subtitleLanguage]) return chapter.subs_url[subtitleLanguage];
+    for (const language of currentDatabun.languages || []) {
+      if (chapter.subs_url?.[language]) return chapter.subs_url[language];
+    }
+    const fallback = Object.values(chapter.subs_url || {})[0];
+    if (typeof fallback === 'string') return fallback;
+    throw new Error(`No subtitles configured for chapter ${chapter.id}`);
+  }
+
+  /**
+   * @param {any} chapter
+   * @param {string} [language]
+   */
+  function getChapterTitle(chapter, language = subtitleLanguage) {
+    if (typeof chapter.title === 'string') return chapter.title;
+    if (chapter.title?.[language]) return chapter.title[language];
+    for (const language of currentDatabun.languages || []) {
+      if (chapter.title?.[language]) return chapter.title[language];
+    }
+    const fallback = Object.values(chapter.title || {})[0];
+    return typeof fallback === 'string' ? fallback : '';
+  }
+
+  /**
+   * @param {any} chapter
+   * @param {string} [language]
+   */
+  function renderChapterTitle(chapter, language = subtitleLanguage) {
+    const ctEl = document.getElementById('chapter-title');
+    if (ctEl) ctEl.textContent = getChapterTitle(chapter, language) || chapterCues[0]?.text || '';
+  }
+
+  /**
+   * @param {any} chapter
+   * @param {number} loadId
+   */
+  async function fetchChapterCues(chapter, loadId) {
+    const subtitleUrl = getSubtitleUrl(chapter);
+    const response = await fetch(subtitleUrl);
+    if (!response.ok) throw new Error(`Failed to load subtitles ${subtitleUrl}: ${response.status}`);
+    const cues = parseVTT(await response.text());
+    if (loadId !== chapterLoadId || destroyed) return null;
+    return cues;
+  }
+
+  function bindSubtitleLanguageSwitcher() {
+    const inputs = /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll('input[name="subtitle-language"]'));
+    inputs.forEach((input, index) => {
+      input.checked = input.value === subtitleLanguage;
+      input.onkeydown = (event) => {
+        const direction = event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1
+          : event.key === 'ArrowLeft' || event.key === 'ArrowUp' ? -1
+          : 0;
+        if (!direction) return;
+        event.preventDefault();
+        event.stopPropagation();
+        const nextIndex = (index + direction + inputs.length) % inputs.length;
+        const nextInput = inputs[nextIndex];
+        nextInput.focus();
+        nextInput.click();
+      };
+      input.onchange = async () => {
+        if (!input.checked || input.value === subtitleLanguage) return;
+        subtitleLanguage = input.value;
+        const loadId = ++chapterLoadId;
+        const chapter = currentDatabun.chapters[chapterIndex];
+        renderChapterTitle(chapter, input.value);
+        const cues = await fetchChapterCues(chapter, loadId);
+        if (!cues) return;
+        await document.fonts?.ready;
+        if (loadId !== chapterLoadId || destroyed) return;
+        chapterCues = cues;
+        renderChapterTitle(chapter, input.value);
+        karaoke?.destroy();
+        karaoke = createKaraoke(/** @type {HTMLElement} */ (document.getElementById('subs-track')), () => player.currentTime);
+        karaoke.render(chapterCues);
+      };
+    });
+  }
+
   /** @param {number} t */
   function updateTotalTime(t) {
     const totalEl = document.getElementById('total-time');
@@ -55,7 +139,7 @@ export function createInterviewsApp() {
     let elapsedTotal = t;
     for (let i = 0; i < chapterIndex; i++) elapsedTotal += chapters[i]._audio_duration_s || 0;
     const grandTotal = chapters.reduce((/** @type {number} */ s, /** @type {any} */ c) => s + (c._audio_duration_s || 0), 0);
-    totalEl.textContent = `${Math.floor(elapsedTotal)} (${Math.floor(grandTotal)})`;
+    totalEl.textContent = `${Math.floor(elapsedTotal)} (${Math.floor(grandTotal)}) seconds`;
   }
 
   function maybeSave() {
@@ -116,18 +200,17 @@ export function createInterviewsApp() {
     chapterIndex = idx;
     const chapter = currentDatabun.chapters[idx];
     player.load(chapter);
-    const response = await fetch(chapter.subs_url);
-    if (!response.ok) throw new Error(`Failed to load subtitles ${chapter.subs_url}: ${response.status}`);
-    const vttText = await response.text();
-    if (loadId !== chapterLoadId || destroyed) return;
-    chapterCues = parseVTT(vttText);
+    const cues = await fetchChapterCues(chapter, loadId);
+    if (!cues) return;
+    chapterCues = cues;
     const isFirstLoad = firstChapterLoad;
     if (isFirstLoad) {
       firstChapterLoad = false;
-      renderPlaybackViewport(viewportEl);
+      renderPlaybackViewport(viewportEl, currentDatabun.languages || [subtitleLanguage]);
+      bindSubtitleLanguageSwitcher();
     }
     const ctEl = /** @type {HTMLElement} */ (document.getElementById('chapter-title'));
-    ctEl.textContent = chapter.title || chapterCues[0]?.text || '';
+    renderChapterTitle(chapter);
     if (isFirstLoad) {
       await tip.ready();
       if (loadId !== chapterLoadId || destroyed) return;
@@ -174,6 +257,49 @@ export function createInterviewsApp() {
   }
 
   function bindTransport() {
+    const volumeWheel = /** @type {HTMLElement} */ (document.getElementById('t-volume'));
+    let dragStartY = 0;
+    let dragStartVolume = player.volume;
+    let draggingVolume = false;
+    /** @param {number} value */
+    const setVolume = (value) => {
+      player.volume = Math.min(1, Math.max(0, value));
+      volumeWheel.style.setProperty('--volume-angle', `${-135 + player.volume * 270}deg`);
+      volumeWheel.setAttribute('aria-valuenow', String(Math.round(player.volume * 100)));
+    };
+    setVolume(player.volume);
+    volumeWheel.onpointerdown = (event) => {
+      draggingVolume = true;
+      dragStartY = event.clientY;
+      dragStartVolume = player.volume;
+      volumeWheel.setPointerCapture(event.pointerId);
+      volumeWheel.classList.add('dragging');
+    };
+    volumeWheel.onpointermove = (event) => {
+      if (!draggingVolume) return;
+      setVolume(dragStartVolume + (dragStartY - event.clientY) / 120);
+    };
+    const endVolumeDrag = () => {
+      draggingVolume = false;
+      volumeWheel.classList.remove('dragging');
+    };
+    volumeWheel.onpointerup = endVolumeDrag;
+    volumeWheel.onpointercancel = endVolumeDrag;
+    volumeWheel.onkeydown = (event) => {
+      if (event.key === 'ArrowUp' || event.key === 'ArrowRight') {
+        event.preventDefault();
+        setVolume(player.volume + 0.05);
+      } else if (event.key === 'ArrowDown' || event.key === 'ArrowLeft') {
+        event.preventDefault();
+        setVolume(player.volume - 0.05);
+      } else if (event.key === 'Home') {
+        event.preventDefault();
+        setVolume(0);
+      } else if (event.key === 'End') {
+        event.preventDefault();
+        setVolume(1);
+      }
+    };
     /** @type {HTMLElement} */ (document.getElementById('t-back15')).onclick = () => {
       player.seek(seekBy({ currentTime: player.currentTime, chapterDuration: player.duration }, -15));
       waveform?.reset();
@@ -239,6 +365,7 @@ export function createInterviewsApp() {
   let tipReadyTimer = null;
   (async () => {
     currentDatabun = await loadDatabun('luna');
+    subtitleLanguage = currentDatabun.languages?.[0] || 'en';
 
     if (!isDesktop()) {
       placementHand = createPlacementHand(app);

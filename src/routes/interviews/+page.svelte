@@ -17,7 +17,10 @@
 </svelte:head>
 
 <div id="app">
-	<h1 class="title">Interview<br />With a Human</h1>
+	<header class="page-header">
+		<h1 class="title">Interview<br />With a Human</h1>
+		<div id="subtitle-language-slot"></div>
+	</header>
 	<div class="viewport" id="viewport">
 		<div class="tip" id="tip">
 			<div class="tip-wrapper"></div>

@@ -8,9 +8,14 @@ export function bindKeyboard(machine, actions) {
   /** @param {KeyboardEvent} e */
   function onKeydown(e) {
     if (machine.state !== 'playing' && machine.state !== 'paused') return;
+    if (e.target instanceof Element && e.target.closest('.subtitle-languages')) return;
     const k = e.key;
     const jumpMod = isMac ? e.metaKey : e.ctrlKey;
-    if (k === ' ' || k === 'Spacebar') { e.preventDefault(); actions.toggle(); }
+    if (k === ' ' || k === 'Spacebar') {
+      e.preventDefault();
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+      actions.toggle();
+    }
     else if (k === 'ArrowLeft'  && jumpMod) { e.preventDefault(); actions.prev(); }
     else if (k === 'ArrowRight' && jumpMod) { e.preventDefault(); actions.next(); }
     else if (k === 'ArrowLeft')  { e.preventDefault(); actions.back15(); }

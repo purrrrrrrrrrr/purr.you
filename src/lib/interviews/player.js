@@ -19,6 +19,9 @@ export function createPlayer() {
     pause() { audio.pause(); },
     /** @param {number} t */
     seek(t) { audio.currentTime = t; },
+    get volume() { return audio.volume; },
+    /** @param {number} value */
+    set volume(value) { audio.volume = Math.min(1, Math.max(0, value)); },
     get ready() { return audio.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA; },
     get currentTime() { return audio.currentTime; },
     get duration() { return isFinite(audio.duration) ? audio.duration : 0; },

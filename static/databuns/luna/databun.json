@@ -1,24 +1,40 @@
 {
   "id": "luna",
   "title": null,
-  "interviewee_name": "LUNA",
+  "interviewee_name": "FRANK LUNA",
+  "languages": [
+    "en",
+    "es"
+  ],
   "chapters": [
     {
       "id": "intro",
-      "title": "Intro",
+      "title": {
+        "en": "Intro",
+        "es": "Introducción"
+      },
       "audio_url": "/databuns/luna/intro.mp3",
-      "subs_url": "/databuns/luna/intro.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/intro_en.vtt",
+        "es": "/databuns/luna/intro_es.vtt"
+      },
       "_source_clip_count": 5,
-      "_timeline_start_s": 0.0,
+      "_timeline_start_s": 0,
       "_timeline_end_s": 41.917,
       "_timeline_span_s": 41.917,
       "_audio_duration_s": 42.24
     },
     {
       "id": "colombian_person_q",
-      "title": "Being a Colombian Person",
+      "title": {
+        "en": "Being a Colombian Person",
+        "es": "Ser colombiano"
+      },
       "audio_url": "/databuns/luna/colombian_person_q.mp3",
-      "subs_url": "/databuns/luna/colombian_person_q_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/colombian_person_q_en.vtt",
+        "es": "/databuns/luna/colombian_person_q_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 41.917,
       "_timeline_end_s": 48.75,
@@ -27,9 +43,15 @@
     },
     {
       "id": "colombian_person_a",
-      "title": "Being a Colombian Person",
+      "title": {
+        "en": "Being a Colombian Person",
+        "es": "Ser colombiano"
+      },
       "audio_url": "/databuns/luna/colombian_person_a.mp3",
-      "subs_url": "/databuns/luna/colombian_person_a_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/colombian_person_a_en.vtt",
+        "es": "/databuns/luna/colombian_person_a_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 48.75,
       "_timeline_end_s": 74.458,
@@ -38,9 +60,15 @@
     },
     {
       "id": "happy_person_q",
-      "title": "Are you a happy person?",
+      "title": {
+        "en": "Are you a happy person?",
+        "es": "¿Eres una persona feliz?"
+      },
       "audio_url": "/databuns/luna/happy_person_q.mp3",
-      "subs_url": "/databuns/luna/happy_person_q_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/happy_person_q_en.vtt",
+        "es": "/databuns/luna/happy_person_q_es.vtt"
+      },
       "_source_clip_count": 2,
       "_timeline_start_s": 74.458,
       "_timeline_end_s": 77.792,
@@ -49,9 +77,15 @@
     },
     {
       "id": "happy_person_a",
-      "title": "Are you a happy person?",
+      "title": {
+        "en": "Are you a happy person?",
+        "es": "¿Eres una persona feliz?"
+      },
       "audio_url": "/databuns/luna/happy_person_a.mp3",
-      "subs_url": "/databuns/luna/happy_person_a_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/happy_person_a_en.vtt",
+        "es": "/databuns/luna/happy_person_a_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 77.792,
       "_timeline_end_s": 127.208,
@@ -60,9 +94,15 @@
     },
     {
       "id": "5_things_happy_q",
-      "title": "Things that make you happy",
+      "title": {
+        "en": "Things that make you happy",
+        "es": "Cosas que te hacen feliz"
+      },
       "audio_url": "/databuns/luna/5_things_happy_q.mp3",
-      "subs_url": "/databuns/luna/5_things_happy_q_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/5_things_happy_q_en.vtt",
+        "es": "/databuns/luna/5_things_happy_q_es.vtt"
+      },
       "_source_clip_count": 2,
       "_timeline_start_s": 127.208,
       "_timeline_end_s": 135.958,
@@ -71,9 +111,15 @@
     },
     {
       "id": "5_things_happy_a",
-      "title": "Things that make you happy",
+      "title": {
+        "en": "Things that make you happy",
+        "es": "Cosas que te hacen feliz"
+      },
       "audio_url": "/databuns/luna/5_things_happy_a.mp3",
-      "subs_url": "/databuns/luna/5_things_happy_a_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/5_things_happy_a_en.vtt",
+        "es": "/databuns/luna/5_things_happy_a_es.vtt"
+      },
       "_source_clip_count": 3,
       "_timeline_start_s": 135.958,
       "_timeline_end_s": 197.208,
@@ -82,9 +128,15 @@
     },
     {
       "id": "do_you_talk_emotions_q",
-      "title": "",
+      "title": {
+        "en": "Do you talk about your emotions?",
+        "es": "¿Hablas de tus emociones?"
+      },
       "audio_url": "/databuns/luna/do_you_talk_emotions_q.mp3",
-      "subs_url": "/databuns/luna/do_you_talk_emotions_q_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/do_you_talk_emotions_q_en.vtt",
+        "es": "/databuns/luna/do_you_talk_emotions_q_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 186.708,
       "_timeline_end_s": 197.333,
@@ -93,9 +145,15 @@
     },
     {
       "id": "do_you_talk_emotions_a",
-      "title": "Do you talk about your emotions?",
+      "title": {
+        "en": "Do you talk about your emotions?",
+        "es": "¿Hablas de tus emociones?"
+      },
       "audio_url": "/databuns/luna/do_you_talk_emotions_a.mp3",
-      "subs_url": "/databuns/luna/do_you_talk_emotions_a_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/do_you_talk_emotions_a_en.vtt",
+        "es": "/databuns/luna/do_you_talk_emotions_a_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 197.208,
       "_timeline_end_s": 233.5,
@@ -104,9 +162,15 @@
     },
     {
       "id": "last_cried_q",
-      "title": "",
+      "title": {
+        "en": "When was the last time you cried?",
+        "es": "¿Cuándo fue la última vez que lloraste?"
+      },
       "audio_url": "/databuns/luna/last_cried_q.mp3",
-      "subs_url": "/databuns/luna/last_cried_q_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/last_cried_q_en.vtt",
+        "es": "/databuns/luna/last_cried_q_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 233.5,
       "_timeline_end_s": 237.458,
@@ -115,9 +179,15 @@
     },
     {
       "id": "last_cried_a",
-      "title": "",
+      "title": {
+        "en": "When was the last time you cried?",
+        "es": "¿Cuándo fue la última vez que lloraste?"
+      },
       "audio_url": "/databuns/luna/last_cried_a.mp3",
-      "subs_url": "/databuns/luna/last_cried_a_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/last_cried_a_en.vtt",
+        "es": "/databuns/luna/last_cried_a_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 237.458,
       "_timeline_end_s": 309.792,
@@ -126,9 +196,15 @@
     },
     {
       "id": "money_mean_q",
-      "title": "",
+      "title": {
+        "en": "What does money mean to you?",
+        "es": "¿Qué significa el dinero para ti?"
+      },
       "audio_url": "/databuns/luna/money_mean_q.mp3",
-      "subs_url": "/databuns/luna/money_mean_q_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/money_mean_q_en.vtt",
+        "es": "/databuns/luna/money_mean_q_es.vtt"
+      },
       "_source_clip_count": 2,
       "_timeline_start_s": 309.792,
       "_timeline_end_s": 317.042,
@@ -137,9 +213,15 @@
     },
     {
       "id": "money_mean_a",
-      "title": "",
+      "title": {
+        "en": "What does money mean to you?",
+        "es": "¿Qué significa el dinero para ti?"
+      },
       "audio_url": "/databuns/luna/money_mean_a.mp3",
-      "subs_url": "/databuns/luna/money_mean_a_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/money_mean_a_en.vtt",
+        "es": "/databuns/luna/money_mean_a_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 317.042,
       "_timeline_end_s": 418.75,
@@ -148,9 +230,15 @@
     },
     {
       "id": "money_family_friends_q",
-      "title": "",
+      "title": {
+        "en": "Do you talk about money?",
+        "es": "¿Hablas de dinero?"
+      },
       "audio_url": "/databuns/luna/money_family_friends_q.mp3",
-      "subs_url": "/databuns/luna/money_family_friends_q_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/money_family_friends_q_en.vtt",
+        "es": "/databuns/luna/money_family_friends_q_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 418.75,
       "_timeline_end_s": 434.375,
@@ -159,9 +247,15 @@
     },
     {
       "id": "money_family_friends_a",
-      "title": "",
+      "title": {
+        "en": "Do you talk about money?",
+        "es": "¿Hablas de dinero?"
+      },
       "audio_url": "/databuns/luna/money_family_friends_a.mp3",
-      "subs_url": "/databuns/luna/money_family_friends_a_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/money_family_friends_a_en.vtt",
+        "es": "/databuns/luna/money_family_friends_a_es.vtt"
+      },
       "_source_clip_count": 2,
       "_timeline_start_s": 434.375,
       "_timeline_end_s": 479.625,
@@ -170,9 +264,15 @@
     },
     {
       "id": "never_think_money_q",
-      "title": "",
+      "title": {
+        "en": "How much money is enough?",
+        "es": "¿Cuánto dinero es suficiente?"
+      },
       "audio_url": "/databuns/luna/never_think_money_q.mp3",
-      "subs_url": "/databuns/luna/never_think_money_q_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/never_think_money_q_en.vtt",
+        "es": "/databuns/luna/never_think_money_q_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 479.625,
       "_timeline_end_s": 485.875,
@@ -181,31 +281,49 @@
     },
     {
       "id": "never_think_money_a",
-      "title": "",
+      "title": {
+        "en": "How much money is enough?",
+        "es": "¿Cuánto dinero es suficiente?"
+      },
       "audio_url": "/databuns/luna/never_think_money_a.mp3",
-      "subs_url": "/databuns/luna/never_think_money_a_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/never_think_money_a_en.vtt",
+        "es": "/databuns/luna/never_think_money_a_es.vtt"
+      },
       "_source_clip_count": 2,
       "_timeline_start_s": 485.875,
-      "_timeline_end_s": 570.0,
+      "_timeline_end_s": 570,
       "_timeline_span_s": 84.125,
       "_audio_duration_s": 84.312
     },
     {
       "id": "rate_humans_q",
-      "title": "",
+      "title": {
+        "en": "How do you rate humans?",
+        "es": "¿Cómo calificas a los seres humanos?"
+      },
       "audio_url": "/databuns/luna/rate_humans_q.mp3",
-      "subs_url": "/databuns/luna/rate_humans_q_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/rate_humans_q_en.vtt",
+        "es": "/databuns/luna/rate_humans_q_es.vtt"
+      },
       "_source_clip_count": 2,
-      "_timeline_start_s": 570.0,
+      "_timeline_start_s": 570,
       "_timeline_end_s": 586.458,
       "_timeline_span_s": 16.458,
       "_audio_duration_s": 16.656
     },
     {
       "id": "rate_humans_a",
-      "title": "",
+      "title": {
+        "en": "How do you rate humans?",
+        "es": "¿Cómo calificas a los seres humanos?"
+      },
       "audio_url": "/databuns/luna/rate_humans_a.mp3",
-      "subs_url": "/databuns/luna/rate_humans_a_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/rate_humans_a_en.vtt",
+        "es": "/databuns/luna/rate_humans_a_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 586.458,
       "_timeline_end_s": 605.917,
@@ -214,9 +332,15 @@
     },
     {
       "id": "rate_animals_q",
-      "title": "",
+      "title": {
+        "en": "How do you rate animals?",
+        "es": "¿Cómo calificas a los animales?"
+      },
       "audio_url": "/databuns/luna/rate_animals_q.mp3",
-      "subs_url": "/databuns/luna/rate_animals_q_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/rate_animals_q_en.vtt",
+        "es": "/databuns/luna/rate_animals_q_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 605.917,
       "_timeline_end_s": 608.667,
@@ -225,9 +349,15 @@
     },
     {
       "id": "rate_animals_a",
-      "title": "",
+      "title": {
+        "en": "How do you rate animals?",
+        "es": "¿Cómo calificas a los animales?"
+      },
       "audio_url": "/databuns/luna/rate_animals_a.mp3",
-      "subs_url": "/databuns/luna/rate_animals_a_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/rate_animals_a_en.vtt",
+        "es": "/databuns/luna/rate_animals_a_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 608.667,
       "_timeline_end_s": 644.292,
@@ -236,9 +366,15 @@
     },
     {
       "id": "rate_plants_q",
-      "title": "",
+      "title": {
+        "en": "How do you rate plants?",
+        "es": "¿Cómo calificas a las plantas?"
+      },
       "audio_url": "/databuns/luna/rate_plants_q.mp3",
-      "subs_url": "/databuns/luna/rate_plants_q_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/rate_plants_q_en.vtt",
+        "es": "/databuns/luna/rate_plants_q_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 644.292,
       "_timeline_end_s": 649.875,
@@ -247,9 +383,15 @@
     },
     {
       "id": "rate_plants_a",
-      "title": "",
+      "title": {
+        "en": "How do you rate plants?",
+        "es": "¿Cómo calificas a las plantas?"
+      },
       "audio_url": "/databuns/luna/rate_plants_a.mp3",
-      "subs_url": "/databuns/luna/rate_plants_a_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/rate_plants_a_en.vtt",
+        "es": "/databuns/luna/rate_plants_a_es.vtt"
+      },
       "_source_clip_count": 3,
       "_timeline_start_s": 649.875,
       "_timeline_end_s": 696.167,
@@ -258,9 +400,15 @@
     },
     {
       "id": "rate_stars_q",
-      "title": "",
+      "title": {
+        "en": "How do you rate stars?",
+        "es": "¿Cómo calificas a las estrellas?"
+      },
       "audio_url": "/databuns/luna/rate_stars_q.mp3",
-      "subs_url": "/databuns/luna/rate_stars_q_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/rate_stars_q_en.vtt",
+        "es": "/databuns/luna/rate_stars_q_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 696.167,
       "_timeline_end_s": 700.583,
@@ -269,9 +417,15 @@
     },
     {
       "id": "rate_stars_a",
-      "title": "",
+      "title": {
+        "en": "How do you rate stars?",
+        "es": "¿Cómo calificas a las estrellas?"
+      },
       "audio_url": "/databuns/luna/rate_stars_a.mp3",
-      "subs_url": "/databuns/luna/rate_stars_a_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/rate_stars_a_en.vtt",
+        "es": "/databuns/luna/rate_stars_a_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 700.583,
       "_timeline_end_s": 750.125,
@@ -280,9 +434,15 @@
     },
     {
       "id": "favorite_number_q",
-      "title": "",
+      "title": {
+        "en": "Favorite number",
+        "es": "Número favorito"
+      },
       "audio_url": "/databuns/luna/favorite_number_q.mp3",
-      "subs_url": "/databuns/luna/favorite_number_q_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/favorite_number_q_en.vtt",
+        "es": "/databuns/luna/favorite_number_q_es.vtt"
+      },
       "_source_clip_count": 2,
       "_timeline_start_s": 750.125,
       "_timeline_end_s": 760.042,
@@ -291,9 +451,15 @@
     },
     {
       "id": "favorite_number_a",
-      "title": "",
+      "title": {
+        "en": "Favorite number",
+        "es": "Número favorito"
+      },
       "audio_url": "/databuns/luna/favorite_number_a.mp3",
-      "subs_url": "/databuns/luna/favorite_number_a_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/favorite_number_a_en.vtt",
+        "es": "/databuns/luna/favorite_number_a_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 760.042,
       "_timeline_end_s": 817.458,
@@ -302,9 +468,15 @@
     },
     {
       "id": "favorite_word_q",
-      "title": "",
+      "title": {
+        "en": "Favorite word",
+        "es": "Palabra favorita"
+      },
       "audio_url": "/databuns/luna/favorite_word_q.mp3",
-      "subs_url": "/databuns/luna/favorite_word_q_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/favorite_word_q_en.vtt",
+        "es": "/databuns/luna/favorite_word_q_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 817.458,
       "_timeline_end_s": 820.625,
@@ -313,9 +485,15 @@
     },
     {
       "id": "favorite_word_a",
-      "title": "",
+      "title": {
+        "en": "Favorite word",
+        "es": "Palabra favorita"
+      },
       "audio_url": "/databuns/luna/favorite_word_a.mp3",
-      "subs_url": "/databuns/luna/favorite_word_a_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/favorite_word_a_en.vtt",
+        "es": "/databuns/luna/favorite_word_a_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 820.625,
       "_timeline_end_s": 898.958,
@@ -324,9 +502,15 @@
     },
     {
       "id": "tune_on_repeat_q",
-      "title": "",
+      "title": {
+        "en": "Tune on repeat",
+        "es": "Canción en repetición"
+      },
       "audio_url": "/databuns/luna/tune_on_repeat_q.mp3",
-      "subs_url": "/databuns/luna/tune_on_repeat_q_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/tune_on_repeat_q_en.vtt",
+        "es": "/databuns/luna/tune_on_repeat_q_es.vtt"
+      },
       "_source_clip_count": 4,
       "_timeline_start_s": 898.958,
       "_timeline_end_s": 905.333,
@@ -335,9 +519,15 @@
     },
     {
       "id": "tune_on_repeat_a",
-      "title": "",
+      "title": {
+        "en": "Tune on repeat",
+        "es": "Canción en repetición"
+      },
       "audio_url": "/databuns/luna/tune_on_repeat_a.mp3",
-      "subs_url": "/databuns/luna/tune_on_repeat_a_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/tune_on_repeat_a_en.vtt",
+        "es": "/databuns/luna/tune_on_repeat_a_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 905.333,
       "_timeline_end_s": 950.625,
@@ -346,9 +536,15 @@
     },
     {
       "id": "favorite_plant_q",
-      "title": "",
+      "title": {
+        "en": "Favourite plant",
+        "es": "Planta favorita"
+      },
       "audio_url": "/databuns/luna/favorite_plant_q.mp3",
-      "subs_url": "/databuns/luna/favorite_plant_q_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/favorite_plant_q_en.vtt",
+        "es": "/databuns/luna/favorite_plant_q_es.vtt"
+      },
       "_source_clip_count": 2,
       "_timeline_start_s": 950.625,
       "_timeline_end_s": 957.792,
@@ -357,9 +553,15 @@
     },
     {
       "id": "favorite_plant_a",
-      "title": "",
+      "title": {
+        "en": "Favourite plant",
+        "es": "Planta favorita"
+      },
       "audio_url": "/databuns/luna/favorite_plant_a.mp3",
-      "subs_url": "/databuns/luna/favorite_plant_a_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/favorite_plant_a_en.vtt",
+        "es": "/databuns/luna/favorite_plant_a_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 957.792,
       "_timeline_end_s": 1009.542,
@@ -368,9 +570,15 @@
     },
     {
       "id": "favorite_snack_q",
-      "title": "",
+      "title": {
+        "en": "Favorite snack",
+        "es": "Snack favorito"
+      },
       "audio_url": "/databuns/luna/favorite_snack_q.mp3",
-      "subs_url": "/databuns/luna/favorite_snack_q_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/favorite_snack_q_en.vtt",
+        "es": "/databuns/luna/favorite_snack_q_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 1009.542,
       "_timeline_end_s": 1016.5,
@@ -379,9 +587,15 @@
     },
     {
       "id": "favorite_snack_a",
-      "title": "",
+      "title": {
+        "en": "Favorite snack",
+        "es": "Snack favorito"
+      },
       "audio_url": "/databuns/luna/favorite_snack_a.mp3",
-      "subs_url": "/databuns/luna/favorite_snack_a_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/favorite_snack_a_en.vtt",
+        "es": "/databuns/luna/favorite_snack_a_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 1016.5,
       "_timeline_end_s": 1043.417,
@@ -390,20 +604,32 @@
     },
     {
       "id": "anything_to_say_q",
-      "title": "",
+      "title": {
+        "en": "Anything to say?",
+        "es": "¿Algo que quieras decir?"
+      },
       "audio_url": "/databuns/luna/anything_to_say_q.mp3",
-      "subs_url": "/databuns/luna/anything_to_say_q_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/anything_to_say_q_en.vtt",
+        "es": "/databuns/luna/anything_to_say_q_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 1043.417,
       "_timeline_end_s": 1055.417,
-      "_timeline_span_s": 12.0,
+      "_timeline_span_s": 12,
       "_audio_duration_s": 12.096
     },
     {
       "id": "anything_to_say_a",
-      "title": "",
+      "title": {
+        "en": "Anything to say?",
+        "es": "¿Algo que quieras decir?"
+      },
       "audio_url": "/databuns/luna/anything_to_say_a.mp3",
-      "subs_url": "/databuns/luna/anything_to_say_a_en.vtt",
+      "subs_url": {
+        "en": "/databuns/luna/anything_to_say_a_en.vtt",
+        "es": "/databuns/luna/anything_to_say_a_es.vtt"
+      },
       "_source_clip_count": 1,
       "_timeline_start_s": 1055.417,
       "_timeline_end_s": 1142.333,
