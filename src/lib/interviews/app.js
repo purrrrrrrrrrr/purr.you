@@ -300,13 +300,17 @@ export function createInterviewsApp() {
         setVolume(1);
       }
     };
-    /** @type {HTMLElement} */ (document.getElementById('t-back15')).onclick = () => {
-      player.seek(seekBy({ currentTime: player.currentTime, chapterDuration: player.duration }, -15));
+    /** @param {number} delta */
+    const seekPlaybackBy = (delta) => {
+      const target = seekBy({ currentTime: player.currentTime, chapterDuration: player.duration }, delta);
+      player.seek(target);
       waveform?.reset();
     };
+    /** @type {HTMLElement} */ (document.getElementById('t-back15')).onclick = () => {
+      seekPlaybackBy(-15);
+    };
     /** @type {HTMLElement} */ (document.getElementById('t-fwd15')).onclick = () => {
-      player.seek(seekBy({ currentTime: player.currentTime, chapterDuration: player.duration }, 15));
-      waveform?.reset();
+      seekPlaybackBy(15);
     };
     /** @type {HTMLElement} */ (document.getElementById('t-play')).onclick = () => {
       if (machine.state === 'playing') { player.pause(); machine.send('TOGGLE_PLAY'); waveform?.pause(); }

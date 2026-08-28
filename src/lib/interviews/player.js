@@ -6,6 +6,7 @@ export function createPlayer() {
   const cbs = { time: [], ended: [], ready: [] };
 
   audio.addEventListener('timeupdate', () => cbs.time.forEach(fn => fn(audio.currentTime)));
+  audio.addEventListener('seeked', () => cbs.time.forEach(fn => fn(audio.currentTime)));
   audio.addEventListener('ended', () => cbs.ended.forEach(fn => fn()));
   audio.addEventListener('canplaythrough', () => cbs.ready.forEach(fn => fn()));
 
@@ -18,7 +19,17 @@ export function createPlayer() {
     play() { return audio.play(); },
     pause() { audio.pause(); },
     /** @param {number} t */
-    seek(t) { audio.currentTime = t; },
+    seek(t) {
+      if (!Number.isFinite(t)) return audio.currentTime;
+      const duration = Number.isFinite(audio.duration) ? audio.duration : Infinity;
+      const target = Math.min(Math.max(0, t), duration);
+      if (typeof audio.fastSeek === 'function') audio.fastSeek(target);
+      else audio.currentTime = target;
+      // Browsers may defer `timeupdate` until playback resumes. Update consumers
+      // immediately as well so paused seeks are reflected in the interface.
+      cbs.time.forEach(fn => fn(target));
+      return target;
+    },
     get volume() { return audio.volume; },
     /** @param {number} value */
     set volume(value) { audio.volume = Math.min(1, Math.max(0, value)); },
