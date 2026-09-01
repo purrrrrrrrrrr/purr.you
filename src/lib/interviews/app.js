@@ -8,7 +8,7 @@ import { loadDatabun } from './databun.js';
 import { createPlayer } from './player.js';
 import { createKaraoke } from './karaoke.js';
 import { parseVTT } from './vtt.js';
-import { seekBy, prevChapter, nextChapter, isLastChapter } from './transport.js';
+import { seekAcrossChapters, prevChapter, nextChapter, isLastChapter } from './transport.js';
 import { bindKeyboard } from './keyboard.js';
 import { saveProgress, loadProgress } from './persistence.js';
 import { createDebugPlacement } from './debug-placement.js';
@@ -301,16 +301,31 @@ export function createInterviewsApp() {
       }
     };
     /** @param {number} delta */
-    const seekPlaybackBy = (delta) => {
-      const target = seekBy({ currentTime: player.currentTime, chapterDuration: player.duration }, delta);
-      player.seek(target);
-      waveform?.reset();
+    const seekPlaybackBy = async (delta) => {
+      const chapterDurations = currentDatabun.chapters.map(
+        (/** @type {any} */ chapter, index) => index === chapterIndex
+          ? player.duration || chapter._audio_duration_s || 0
+          : chapter._audio_duration_s || 0
+      );
+      const target = seekAcrossChapters({
+        chapterIndex,
+        currentTime: player.currentTime,
+        chapterDurations
+      }, delta);
+      if (target.chapterIndex === chapterIndex) {
+        player.seek(target.currentTime);
+        karaoke?.resetAfterSeek(target.currentTime);
+        waveform?.reset();
+      } else {
+        await loadChapter(target.chapterIndex, target.currentTime);
+        karaoke?.resetAfterSeek(target.currentTime);
+      }
     };
     /** @type {HTMLElement} */ (document.getElementById('t-back15')).onclick = () => {
-      seekPlaybackBy(-15);
+      void seekPlaybackBy(-15);
     };
     /** @type {HTMLElement} */ (document.getElementById('t-fwd15')).onclick = () => {
-      seekPlaybackBy(15);
+      void seekPlaybackBy(15);
     };
     /** @type {HTMLElement} */ (document.getElementById('t-play')).onclick = () => {
       if (machine.state === 'playing') { player.pause(); machine.send('TOGGLE_PLAY'); waveform?.pause(); }

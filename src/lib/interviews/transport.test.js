@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { seekBy, prevChapter, nextChapter, isLastChapter } from './transport.js';
+import { seekBy, seekAcrossChapters, prevChapter, nextChapter, isLastChapter } from './transport.js';
 
 describe('seekBy', () => {
   it('seeks forward within chapter', () => {
@@ -16,6 +16,32 @@ describe('seekBy', () => {
   });
   it('does not snap to 0 when chapter duration is unknown', () => {
     expect(seekBy({ currentTime: 5, chapterDuration: 0 }, 15)).toBe(20);
+  });
+});
+
+describe('seekAcrossChapters', () => {
+  const chapterDurations = [10, 20, 30];
+
+  it('carries a forward seek into the next chapter', () => {
+    expect(seekAcrossChapters({ chapterIndex: 0, currentTime: 4, chapterDurations }, 15))
+      .toEqual({ chapterIndex: 1, currentTime: 9 });
+  });
+
+  it('carries a backward seek into the previous chapter', () => {
+    expect(seekAcrossChapters({ chapterIndex: 1, currentTime: 4, chapterDurations }, -15))
+      .toEqual({ chapterIndex: 0, currentTime: 0 });
+  });
+
+  it('crosses multiple short chapters', () => {
+    expect(seekAcrossChapters({ chapterIndex: 0, currentTime: 8, chapterDurations }, 30))
+      .toEqual({ chapterIndex: 2, currentTime: 8 });
+  });
+
+  it('clamps at the beginning and end of the databun', () => {
+    expect(seekAcrossChapters({ chapterIndex: 0, currentTime: 2, chapterDurations }, -15))
+      .toEqual({ chapterIndex: 0, currentTime: 0 });
+    expect(seekAcrossChapters({ chapterIndex: 2, currentTime: 25, chapterDurations }, 15))
+      .toEqual({ chapterIndex: 2, currentTime: 30 });
   });
 });
 

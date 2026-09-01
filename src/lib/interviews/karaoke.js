@@ -13,6 +13,8 @@ export function createKaraoke(containerEl, getTime) {
   let lineGroups = [];
   let activeCueIdx = -1;
   let activeLineIdx = 0;
+  /** @type {{ cueIdx: number, lineIdx: number, time: number } | null} */
+  let seekOrigin = null;
   /** @type {number | null} */
   let rafId = null;
 
@@ -42,6 +44,14 @@ export function createKaraoke(containerEl, getTime) {
     const centeredRowOffset = Math.max(0, (visibleHeight - rowHeight) / 2);
     const dy = lineOffset - centeredRowOffset;
     containerEl.style.transform = `translateY(${-dy}px)`;
+  }
+
+  /** Place a line at the top of the subtitle viewport after a transport seek. */
+  function positionLineAtTop(idx, lineIdx) {
+    const firstRow = /** @type {HTMLElement | null} */ (cueEls[idx]?.querySelector('.cue-line'));
+    const rowHeight = firstRow?.offsetHeight || 0;
+    const cueOffset = cueEls[idx].offsetTop - cueEls[0].offsetTop;
+    containerEl.style.transform = `translateY(${-Math.max(0, cueOffset + lineIdx * rowHeight)}px)`;
   }
 
   function onResize() {
@@ -93,6 +103,7 @@ export function createKaraoke(containerEl, getTime) {
     cues = cuesNext;
     activeCueIdx = -1;
     activeLineIdx = 0;
+    seekOrigin = null;
 
     containerEl.innerHTML = cues.map((c, i) => `
       <div class="cue" data-cue="${i}"><div class="cue-measure"><span class="cue-words">${
@@ -142,6 +153,7 @@ export function createKaraoke(containerEl, getTime) {
       }
       activeCueIdx = idx;
       activeLineIdx = 0;
+      seekOrigin = null;
       cueEls.forEach((el, i) => el.classList.toggle('active', i === idx));
       positionActiveCue(idx);
     }
@@ -151,9 +163,14 @@ export function createKaraoke(containerEl, getTime) {
       positionActiveCue(idx, activeLineIdx);
     }
     for (const line of lineGroups[idx]) {
-      const progress = currentTime < line.start ? 0
+      const lineIdx = lineGroups[idx].indexOf(line);
+      const resetStart = seekOrigin?.cueIdx === idx && seekOrigin.lineIdx === lineIdx
+        ? Math.max(line.start, seekOrigin.time)
+        : line.start;
+      const beforeResetLine = seekOrigin?.cueIdx === idx && lineIdx < seekOrigin.lineIdx;
+      const progress = beforeResetLine || currentTime < resetStart ? 0
         : currentTime >= line.end ? 1
-        : (currentTime - line.start) / (line.end - line.start);
+        : (currentTime - resetStart) / Math.max(0.001, line.end - resetStart);
       const textPhaseEnd = 0.8;
       const tailProgress = Math.max(0, (progress - textPhaseEnd) / (1 - textPhaseEnd));
       const acceleratedTail = 0.2 * tailProgress + 0.8 * tailProgress * tailProgress;
@@ -164,10 +181,31 @@ export function createKaraoke(containerEl, getTime) {
     }
   }
 
+  /**
+   * Clear all fills and restart karaoke at the line reached by a transport seek.
+   * @param {number} currentTime
+   */
+  function resetAfterSeek(currentTime) {
+    lineGroups.flat().forEach(line => {
+      line.el.style.clipPath = 'inset(0 100% 0 0)';
+    });
+    let idx = cues.findIndex(cue => currentTime >= cue.start && currentTime < cue.end);
+    if (idx === -1) idx = cues.findIndex(cue => cue.start >= currentTime);
+    if (idx === -1) idx = Math.max(0, cues.length - 1);
+    const lines = lineGroups[idx] || [];
+    let lineIdx = lines.findIndex(line => currentTime < line.end);
+    if (lineIdx === -1) lineIdx = Math.max(0, lines.length - 1);
+    activeCueIdx = idx;
+    activeLineIdx = lineIdx;
+    seekOrigin = { cueIdx: idx, lineIdx, time: Math.max(currentTime, lines[lineIdx]?.start || currentTime) };
+    cueEls.forEach((el, i) => el.classList.toggle('active', i === idx));
+    if (cueEls[idx]) positionLineAtTop(idx, lineIdx);
+  }
+
   function destroy() {
     if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
     window.removeEventListener('resize', onResize);
   }
 
-  return { render, destroy };
+  return { render, resetAfterSeek, destroy };
 }

@@ -10,6 +10,34 @@ export function seekBy({ currentTime, chapterDuration }, delta) {
 }
 
 /**
+ * Resolve a relative seek across chapter boundaries.
+ * @param {{ chapterIndex: number, currentTime: number, chapterDurations: number[] }} state
+ * @param {number} delta
+ */
+export function seekAcrossChapters({ chapterIndex, currentTime, chapterDurations }, delta) {
+  let index = chapterIndex;
+  let target = currentTime + delta;
+
+  while (target < 0 && index > 0) {
+    index--;
+    target += Math.max(0, chapterDurations[index] || 0);
+  }
+
+  while (index < chapterDurations.length - 1) {
+    const duration = Math.max(0, chapterDurations[index] || 0);
+    if (target < duration) break;
+    target -= duration;
+    index++;
+  }
+
+  const duration = Math.max(0, chapterDurations[index] || 0);
+  return {
+    chapterIndex: index,
+    currentTime: Math.min(Math.max(0, target), duration)
+  };
+}
+
+/**
  * @param {number} index
  * @param {number} total
  */
