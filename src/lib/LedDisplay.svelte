@@ -5,7 +5,9 @@
 	let {
 		text  = 'WIMMY THE SCROLL',
 		color = '#ff9dd0',
-	}: { text?: string; color?: string } = $props();
+		staticText = false,
+		showArrows = true,
+	}: { text?: string; color?: string; staticText?: boolean; showArrows?: boolean } = $props();
 
 	let canvas: HTMLCanvasElement;
 
@@ -122,9 +124,9 @@
 		const arrowColLeft  = 4;
 		const arrowColRight = COLS - CHAR_W - 4;
 
-		let offset        = TEXT_W;
-		let stopped       = false;
-		let arrowStarted  = false;
+		let offset        = staticText ? target : TEXT_W;
+		let stopped       = staticText;
+		let arrowStarted  = !showArrows;
 		let arrowFrame    = 0;
 		let arrowTimer: ReturnType<typeof setInterval> | null = null;
 		let lastTime      = 0;
@@ -169,7 +171,7 @@
 				for (let col = 0; col < COLS; col++) {
 					const inZone = col >= PAD && col < COLS - PAD;
 					const on     = inZone && isOn(col - PAD, row);
-					const arrow  = stopped
+					const arrow  = stopped && showArrows
 						? (arrowLeft(col, row, arrowFrame, arrowColLeft) ?? arrowRight(col, row, arrowFrame, arrowColRight))
 						: null;
 					const x      = (col + 0.5) * cW;

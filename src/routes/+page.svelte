@@ -4,18 +4,52 @@
 	import Editor from "$lib/webblock/Editor.svelte";
 	import FloatingCard from "$lib/FloatingCard.svelte";
 	import LedDisplay from "$lib/LedDisplay.svelte";
+	import interviewsLogoRaw from "../../assets/interview/interviews_logo.svg?raw";
+	import wimmyLogoRaw from "../../static/wimmy/assets/wimmy_logo.svg?raw";
+
+	let { initialIssue = "001" }: { initialIssue?: "001" | "002" } = $props();
 
 	let cursorX = $state(-200);
 	let cursorY = $state(-200);
 	let cardHovered = $state(false);
 	let pawTilt = $state(0);
+	let hoveredProjectIssue: "001" | "002" | null = $state(null);
+	let returningFromLogoPreview = $state(false);
+	let ledArrowReset = $state(0);
 
 	// ── dial ──
-	let digits = $state([0, 0, 1]);
+	let digits = $state(initialIssue.split("").map(Number));
+	$effect(() => {
+		digits = initialIssue.split("").map(Number);
+	});
 
 	// ── editor ──
 	let editorActive = $state(false);
 	const dialStr = $derived(digits.map(String).join(""));
+	const ledCaption = $derived(
+		hoveredProjectIssue && hoveredProjectIssue !== dialStr
+			? hoveredProjectIssue === "001"
+				? "WIMMY THE SCROLL"
+				: "INTERVIEWS"
+			: dialStr === "001"
+				? "WIMMY THE SCROLL"
+				: "INTERVIEWS",
+	);
+	const showingHoveredCaption = $derived(
+		hoveredProjectIssue !== null && hoveredProjectIssue !== dialStr,
+	);
+	const interviewsLogoSvg = $derived(
+		dialStr === "001"
+			? interviewsLogoRaw.replaceAll("#FFE600", "#FF9DD0")
+			: interviewsLogoRaw,
+	);
+	const wimmyLogoSvg = $derived(
+		dialStr === "002"
+			? wimmyLogoRaw
+				.replaceAll("#1C0510", "#002107")
+				.replaceAll("#FF9DD0", "#FFE600")
+			: wimmyLogoRaw,
+	);
 
 	function drumHandler(i: number) {
 		return (e: MouseEvent) => {
@@ -37,6 +71,26 @@
 			Math.floor((val % 100) / 10),
 			val % 10,
 		];
+	}
+
+	function showProjectCard(card: 1 | 2) {
+		const issue = String(card).padStart(3, "0") as "001" | "002";
+		returningFromLogoPreview = false;
+		digits = issue.split("").map(Number);
+		void goto(`/${issue}`);
+	}
+
+	function previewProject(issue: "001" | "002") {
+		returningFromLogoPreview = false;
+		hoveredProjectIssue = issue;
+	}
+
+	function endProjectPreview() {
+		if (hoveredProjectIssue && hoveredProjectIssue !== dialStr) {
+			returningFromLogoPreview = true;
+			ledArrowReset += 1;
+		}
+		hoveredProjectIssue = null;
 	}
 
 	// ── 000: banner ──
@@ -67,7 +121,7 @@
 		dialStr === "001"
 			? "#1c0510"
 			: dialStr === "002"
-				? "#ff6a00"
+				? "#002107"
 				: "#3a0000",
 	);
 	$effect(() => {
@@ -150,11 +204,6 @@
 			cancelled = true;
 		};
 	});
-
-	// ── orientation splash ──
-	let splashVisible = $state(false);
-	let splashCountdown = $state(3);
-	let splashFading = $state(false);
 
 	// ── 001: participation overlay ──
 	let overlayVisible = $state(false);
@@ -254,18 +303,6 @@
 			}, 1000);
 		}
 
-		if (window.matchMedia('(max-width: 768px) and (orientation: portrait)').matches) {
-			splashVisible = true;
-			const interval = setInterval(() => {
-				splashCountdown -= 1;
-				if (splashCountdown <= 0) {
-					clearInterval(interval);
-					splashFading = true;
-					setTimeout(() => { splashVisible = false; }, 800);
-				}
-			}, 1000);
-		}
-
 		let titleCounter = 0;
 		const titleParts = document.title.split(" ");
 		const wind = titleParts[titleParts.length - 1];
@@ -325,21 +362,9 @@
 	></script>
 </svelte:head>
 
-{#if splashVisible}
-<div class="orientation-splash" class:fading={splashFading}>
-	<p class="splash-title">PURR IS BETTER HORIZONTAL</p>
-	<div class="splash-device">
-		<span class="splash-phone">📱</span>
-		<span class="splash-hand">🤚</span>
-	</div>
-	<p class="splash-sub">disappears in {splashCountdown}</p>
-	<p class="splash-desktop">and even better on desktop 🧡</p>
-</div>
-{/if}
-
 <!-- ── left panel: cats + dial ── -->
 <div class="left-panel">
-	{#if dialStr === "001"}
+	{#if dialStr === "001" || dialStr === "002"}
 		<div class="cats">
 			<span class="purr-layer purr-pink">PURR</span>
 			<span class="purr-layer purr-gold">PURR</span>
@@ -390,16 +415,20 @@
 
 <!-- ── right panel: project logos ── -->
 <div class="right-panel">
-	{#if dialStr === "001"}
-		<div class="project-logos">
+	{#if dialStr === "001" || dialStr === "002"}
+		<div
+			class="project-logos"
+			class:wimmy-active={dialStr === "001"}
+			class:interviews-active={dialStr === "002"}
+			style:--project-accent={dialStr === "001" ? "#ff9dd0" : "#ffe600"}
+		>
 			<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
-			<div class="logo-circle" on:click={() => goto('/wimmy')}>
-				<img
-					class="project-logo"
-					src="/wimmy/assets/wimmy_logo.svg"
-					alt="Wimmy"
-				/>
-			</div>
+			<button class="project-logo-button" type="button" on:mouseenter={() => previewProject("002")} on:mouseleave={endProjectPreview} on:click={() => showProjectCard(2)} aria-label="Show Interviews card">
+				<span class="project-logo project-logo-svg" role="img" aria-label="Interviews">{@html interviewsLogoSvg}</span>
+			</button>
+			<button class="project-logo-button" type="button" on:mouseenter={() => previewProject("001")} on:mouseleave={endProjectPreview} on:click={() => showProjectCard(1)} aria-label="Show Wimmy card">
+				<span class="project-logo project-logo-svg" role="img" aria-label="Wimmy">{@html wimmyLogoSvg}</span>
+			</button>
 		</div>
 	{/if}
 </div>
@@ -458,19 +487,29 @@
 {:else if dialStr === "001"}
 	<!-- ── page 001: purr.you ── -->
 	<div class="app page-001">
-		<LedDisplay text="WIMMY THE SCROLL" color="#ff9dd0" />
+		<div class="led-panel-border" style:border-color="#ff9dd0" aria-hidden="true"></div>
+		<div class="led-caption-layer" class:led-caption-hidden={showingHoveredCaption}>
+			{#key ledArrowReset}
+				<LedDisplay text="WIMMY THE SCROLL" color="#ff9dd0" staticText={returningFromLogoPreview} />
+			{/key}
+		</div>
+		{#if showingHoveredCaption}
+			<div class="led-caption-layer led-caption-preview">
+				<LedDisplay text={ledCaption} color="#ff9dd0" staticText showArrows={false} />
+			</div>
+		{/if}
 		<div class="page"></div>
 		<FloatingCard glowColor="#ff9dd0">
 		<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
-		<div class="wimmy-card" on:click={() => goto('/wimmy')} on:mouseenter={() => (cardHovered = true)} on:mouseleave={() => (cardHovered = false)}>
-			<div class="wimmy-header">
+		<div class="project-card wimmy-card" on:click={() => goto('/wimmy')} on:mouseenter={() => (cardHovered = true)} on:mouseleave={() => (cardHovered = false)}>
+			<div class="project-card-header wimmy-header">
 				<p class="wimmy-desc">
 					A free media for Wimbledon distributed
 					to Wimbledonians one scroll thermo-printed on receipt paper
 					at a time.
 				</p>
 			</div>
-			<div class="wimmy-video-wrap">
+			<div class="project-card-media wimmy-video-wrap">
 				<video
 					class="wimmy-video"
 					src="/wimmy/assets/wimmy_1.mp4"
@@ -587,8 +626,31 @@
 		</div>
 	{/if}
 {:else if dialStr === "002"}
-	<!-- ── page 002: orange template ── -->
-	<div class="page-002"></div>
+	<!-- ── page 002: Interview with a Human ── -->
+	<div class="app page-002">
+		<div class="led-panel-border" style:border-color="#ffe600" aria-hidden="true"></div>
+		<div class="led-caption-layer" class:led-caption-hidden={showingHoveredCaption}>
+			{#key ledArrowReset}
+				<LedDisplay text="INTERVIEWS" color="#ffe600" staticText={returningFromLogoPreview} />
+			{/key}
+		</div>
+		{#if showingHoveredCaption}
+			<div class="led-caption-layer led-caption-preview">
+				<LedDisplay text={ledCaption} color="#ffe600" staticText showArrows={false} />
+			</div>
+		{/if}
+		<FloatingCard glowColor="#ffe600">
+			<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+			<div class="project-card interviews-card" on:click={() => goto('/interviews')} on:mouseenter={() => (cardHovered = true)} on:mouseleave={() => (cardHovered = false)}>
+				<div class="project-card-header">
+					<p class="interviews-card-description">Humans sharing their thoughts on life, money and their favourite things</p>
+				</div>
+				<div class="project-card-media interviews-picture-wrap">
+					<img class="interviews-card-picture" src="/interviews_card_pic.png" alt="Interview with a Human" />
+				</div>
+			</div>
+		</FloatingCard>
+	</div>
 {/if}
 
 <div class="purr-version">purr v1.1.8</div>
@@ -641,7 +703,7 @@
 	/* ── right panel ── */
 	.right-panel {
 		position: fixed;
-		right: 20px;
+		right: 36px;
 		top: 50%;
 		transform: translateY(-50%);
 		z-index: 900;
@@ -654,28 +716,107 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 20px;
+		gap: 36px;
+		transition: transform 300ms ease;
 	}
 
-	.logo-circle {
+	.project-logos.wimmy-active {
+		transform: translateY(-50px);
+	}
+
+	.project-logos.interviews-active {
+		transform: translateY(50px);
+	}
+
+	.project-logo-button {
+		position: relative;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 9px;
-		background: rgba(0, 0, 0, 0.1);
-		border-radius: 9999px;
+		width: 64px;
+		height: 64px;
+		padding: 0;
+		border: 0;
+		background: transparent;
 		cursor: pointer;
 		opacity: 0.85;
 		transition: opacity 0.15s;
 	}
 
-	.logo-circle:hover {
+	.project-logo-button:hover {
 		opacity: 1;
+	}
+
+	.project-logos.interviews-active .project-logo-button:first-child,
+	.project-logos.wimmy-active .project-logo-button:last-child {
+		opacity: 1;
+	}
+
+	.project-logos.interviews-active .project-logo-button:first-child::before,
+	.project-logos.wimmy-active .project-logo-button:last-child::before {
+		content: "";
+		position: absolute;
+		left: -34px;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 0;
+		height: 0;
+		border-top: 6px solid transparent;
+		border-bottom: 6px solid transparent;
+		border-left: 10px solid var(--project-accent);
+	}
+
+	.led-panel-border {
+		position: absolute;
+		top: 32px;
+		left: 50%;
+		z-index: 1;
+		transform: translateX(-50%);
+		width: 420px;
+		height: 64px;
+		border: 1px solid;
+		pointer-events: none;
+	}
+
+	.led-caption-layer {
+		opacity: 1;
+		transition: opacity 140ms ease;
+	}
+
+	.led-caption-hidden {
+		opacity: 0;
+	}
+
+	.led-caption-preview {
+		animation: led-caption-fade-in 180ms ease both;
+	}
+
+	@keyframes led-caption-fade-in {
+		from { opacity: 0; }
+		to { opacity: 1; }
 	}
 
 	.project-logo {
 		width: 64px;
 		height: 64px;
+		display: block;
+	}
+
+	.project-logo-button:first-child .project-logo {
+		transform: scale(1.69);
+	}
+
+	.project-logos.wimmy-active .project-logo-button:last-child .project-logo {
+		transform: scale(1.32);
+	}
+
+	.project-logos.interviews-active .project-logo-button:first-child .project-logo {
+		transform: scale(2.2308);
+	}
+
+	.project-logo-svg :global(svg) {
+		width: 100%;
+		height: 100%;
 		display: block;
 	}
 
@@ -876,7 +1017,7 @@
 		position: relative;
 	}
 
-	.wimmy-card {
+	.project-card {
 		position: absolute;
 		top: 50%;
 		left: 50%;
@@ -894,7 +1035,7 @@
 		margin: 0;
 	}
 
-	.wimmy-header {
+	.project-card-header {
 		display: flex;
 		flex-direction: row;
 		align-items: center;
@@ -903,11 +1044,26 @@
 	}
 
 	@media screen and (min-width: 700px) {
-		.wimmy-header { padding: 0; line-height: 1.32; }
-		.wimmy-card { gap: 32px; }
+		.project-card-header { padding: 0; line-height: 1.32; }
+		.project-card { gap: 32px; }
 	}
-	.wimmy-video-wrap {
+	.project-card-media {
+		width: 100%;
 		overflow: hidden;
+		opacity: 0;
+		animation: card-media-fade-in 0.45s ease-out 0.28s forwards;
+	}
+
+	@keyframes card-media-fade-in {
+		to {
+			opacity: 1;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.project-card-media {
+			animation-duration: 0.01ms;
+		}
 	}
 
 	.wimmy-video {
@@ -1493,78 +1649,35 @@
 		color: var(--mango);
 	}
 
-	/* ── orientation splash ── */
-	.orientation-splash {
-		position: fixed;
-		inset: 0;
-		z-index: 9999;
-		background: var(--dark-cherry);
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		gap: 28px;
-		opacity: 1;
-		transition: opacity 0.8s ease;
-	}
-	.orientation-splash.fading {
-		opacity: 0;
-	}
-	.splash-title {
-		color: var(--mango);
-		font-family: "Alexandria", sans-serif;
-		font-size: clamp(22px, 7vw, 40px);
-		font-weight: 700;
-		text-align: center;
-		padding: 0 32px;
-		letter-spacing: 0.04em;
-		line-height: 1.3;
-	}
-	.splash-device {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0;
-		animation: device-rotate 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-	}
-	.splash-phone {
-		font-size: 52px;
-		line-height: 1;
-	}
-	.splash-hand {
-		font-size: 38px;
-		line-height: 1;
-		margin-top: -4px;
-	}
-
-	@keyframes device-rotate {
-		0%, 15%  { transform: rotate(0deg); }
-		50%, 75% { transform: rotate(-90deg); }
-		90%      { transform: rotate(-90deg); }
-		100%     { transform: rotate(0deg); }
-	}
-
-	.splash-sub {
-		color: rgba(254, 186, 0, 0.45);
-		font-family: "Alexandria", sans-serif;
-		font-size: 15px;
-		font-weight: 400;
-		letter-spacing: 0.06em;
-	}
-
-	.splash-desktop {
-		color: rgba(254, 186, 0, 0.45);
-		font-family: "Alexandria", sans-serif;
-		font-size: 10px;
-		font-weight: 300;
-		letter-spacing: 0.06em;
-		margin-top: 4px;
-	}
-
 	/* ── 002 ── */
 	.page-002 {
+		position: relative;
 		width: 100vw;
 		height: 100vh;
+	}
+
+	.interviews-card {
+		color: #ffe600;
+		padding-bottom: 16px;
+	}
+
+	.interviews-card-description {
+		color: #ffe600;
+		font-family: "Alexandria", sans-serif;
+		font-size: 18px;
+		font-weight: 300;
+		line-height: 1.32;
+	}
+
+	.interviews-picture-wrap {
+		flex: 1 1 auto;
+		min-height: 0;
+	}
+
+	.interviews-card-picture {
+		width: 100%;
+		height: auto;
+		display: block;
 	}
 
 	/* ── editor toggle ── */
@@ -1605,11 +1718,16 @@
 	}
 
 	@media screen and (max-width: 699px) {
+		.led-panel-border {
+			width: 300px;
+			height: 53px;
+		}
+
 		.right-panel {
 			display: none;
 		}
 
-		.wimmy-card {
+		.project-card {
 			width: 300px;
 			min-width: 300px;
 			max-width: 300px;

@@ -17,6 +17,17 @@ const MOBILE_MAX = 899;
 const isDesktop = () => window.innerWidth > MOBILE_MAX;
 
 export function createInterviewsApp() {
+	const focusModeRoot = document.documentElement;
+	/** @param {KeyboardEvent} event */
+	const updateKeyboardFocusMode = (event) => {
+		focusModeRoot.classList.toggle('tab-focus-visible', event.key === 'Tab');
+	};
+	const clearKeyboardFocusMode = () => {
+		focusModeRoot.classList.remove('tab-focus-visible');
+	};
+	window.addEventListener('keydown', updateKeyboardFocusMode, true);
+	window.addEventListener('pointerdown', clearKeyboardFocusMode, true);
+
   const machine = createMachine();
   const tip = createTip(/** @type {HTMLElement} */ (document.getElementById('tip')));
   const app = /** @type {HTMLElement} */ (document.getElementById('app'));
@@ -115,6 +126,8 @@ export function createInterviewsApp() {
       input.onchange = async () => {
         if (!input.checked || input.value === subtitleLanguage) return;
         subtitleLanguage = input.value;
+		const playbackPanel = /** @type {HTMLElement | null} */ (document.getElementById('playback-panel'));
+		playbackPanel?.focus({ preventScroll: true });
         const loadId = ++chapterLoadId;
         const chapter = currentDatabun.chapters[chapterIndex];
         renderChapterTitle(chapter, input.value);
@@ -199,7 +212,7 @@ export function createInterviewsApp() {
     chapterContentReady = false;
     chapterIndex = idx;
     const chapter = currentDatabun.chapters[idx];
-    player.load(chapter);
+    player.load(chapter, startAt);
     const cues = await fetchChapterCues(chapter, loadId);
     if (!cues) return;
     chapterCues = cues;
@@ -245,7 +258,6 @@ export function createInterviewsApp() {
     if (karaoke) karaoke.destroy();
     karaoke = createKaraoke(/** @type {HTMLElement} */ (document.getElementById('subs-track')), () => player.currentTime);
     karaoke.render(chapterCues);
-    player.seek(startAt);
     chapterContentReady = true;
     if (machine.state === 'loading' && player.ready) machine.send('READY');
     waveform?.reset();
@@ -397,6 +409,9 @@ export function createInterviewsApp() {
   return {
     destroy() {
       destroyed = true;
+		focusModeRoot.classList.remove('tab-focus-visible');
+		window.removeEventListener('keydown', updateKeyboardFocusMode, true);
+		window.removeEventListener('pointerdown', clearKeyboardFocusMode, true);
       chapterLoadId++;
       if (tipReadyTimer) clearTimeout(tipReadyTimer);
       revealTimers.forEach(clearTimeout);

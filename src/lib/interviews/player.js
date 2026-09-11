@@ -4,15 +4,29 @@ export function createPlayer() {
 
   /** @type {{ time: ((t: number) => void)[], ended: (() => void)[], ready: (() => void)[] }} */
   const cbs = { time: [], ended: [], ready: [] };
+	/** @type {number | null} */
+	let pendingSeek = null;
+
+	function applyPendingSeek() {
+		if (pendingSeek === null || audio.readyState < HTMLMediaElement.HAVE_METADATA) return;
+		const target = Math.min(Math.max(0, pendingSeek), Number.isFinite(audio.duration) ? audio.duration : pendingSeek);
+		pendingSeek = null;
+		audio.currentTime = target;
+	}
 
   audio.addEventListener('timeupdate', () => cbs.time.forEach(fn => fn(audio.currentTime)));
   audio.addEventListener('seeked', () => cbs.time.forEach(fn => fn(audio.currentTime)));
+	audio.addEventListener('loadedmetadata', applyPendingSeek);
   audio.addEventListener('ended', () => cbs.ended.forEach(fn => fn()));
   audio.addEventListener('canplaythrough', () => cbs.ready.forEach(fn => fn()));
 
   return {
-    /** @param {{ audio_url: string }} chapter */
-    load(chapter) {
+    /**
+	 * @param {{ audio_url: string }} chapter
+	 * @param {number} [startAt]
+	 */
+    load(chapter, startAt = 0) {
+	  pendingSeek = Number.isFinite(startAt) ? Math.max(0, startAt) : 0;
       audio.src = chapter.audio_url;
       audio.load();
     },
@@ -21,10 +35,9 @@ export function createPlayer() {
     /** @param {number} t */
     seek(t) {
       if (!Number.isFinite(t)) return audio.currentTime;
-      const duration = Number.isFinite(audio.duration) ? audio.duration : Infinity;
-      const target = Math.min(Math.max(0, t), duration);
-      if (typeof audio.fastSeek === 'function') audio.fastSeek(target);
-      else audio.currentTime = target;
+	  const target = Math.max(0, t);
+	  pendingSeek = target;
+	  applyPendingSeek();
       // Browsers may defer `timeupdate` until playback resumes. Update consumers
       // immediately as well so paused seeks are reflected in the interface.
       cbs.time.forEach(fn => fn(target));

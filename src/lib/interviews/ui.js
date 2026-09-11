@@ -45,7 +45,7 @@ export function renderPlaybackViewport(viewportEl, languages) {
  */
 export function renderTransport(rightEl, databun) {
   rightEl.innerHTML = `
-    <div class="playback-panel">
+    <div class="playback-panel" id="playback-panel" tabindex="-1" aria-label="Playback controls">
       <div class="playback-main">
         <div class="timeline" id="timeline">
           <div class="timeline-bar" id="timeline-bar">

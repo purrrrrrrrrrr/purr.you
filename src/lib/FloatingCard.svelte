@@ -12,27 +12,40 @@
 		const outlineTimer = setTimeout(() => { outlined = true; }, 50);
 
 		let tiltReady = false;
+		let currentRx = 4;
+		let currentRy = -7;
+		let targetRx = currentRx;
+		let targetRy = currentRy;
+		let followRaf: number | null = null;
 		const tiltTimer = setTimeout(() => {
 			tiltReady = true;
 			el!.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
 			el!.style.transform = 'translate(-50%, -50%) perspective(600px) rotateX(4deg) rotateY(-7deg)';
-			setTimeout(() => { el!.style.transition = 'none'; }, 550);
+			setTimeout(() => {
+				el!.style.transition = 'none';
+				function followPointer() {
+					currentRx += (targetRx - currentRx) * 0.1;
+					currentRy += (targetRy - currentRy) * 0.1;
+					el!.style.transform = `translate(-50%, -50%) perspective(600px) rotateX(${currentRx.toFixed(2)}deg) rotateY(${currentRy.toFixed(2)}deg)`;
+					followRaf = requestAnimationFrame(followPointer);
+				}
+				followRaf = requestAnimationFrame(followPointer);
+			}, 550);
 		}, 350);
 
 		function onMouseMove(e: MouseEvent) {
 			if (!tiltReady) return;
 			const dx = (e.clientX - window.innerWidth  / 2) / (window.innerWidth  / 2);
 			const dy = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
-			const rx = -dy * 20;
-			const ry =  dx * 20;
-			el!.style.transition = 'none';
-			el!.style.transform = `translate(-50%, -50%) perspective(600px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
+			targetRx = -dy * 20;
+			targetRy = dx * 20;
 		}
 
 		window.addEventListener('mousemove', onMouseMove);
 		return () => {
 			clearTimeout(outlineTimer);
 			clearTimeout(tiltTimer);
+			if (followRaf !== null) cancelAnimationFrame(followRaf);
 			window.removeEventListener('mousemove', onMouseMove);
 		};
 	});
