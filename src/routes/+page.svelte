@@ -650,6 +650,21 @@
 				</div>
 			</div>
 		</FloatingCard>
+		<div class="marquee-strip interviews-marquee" class:expanded={marqueeHovered}>
+			<span class="marquee-text" bind:this={marqueeEl}
+				>PURR is a collection of free interactive experiences for humans</span
+			>
+		</div>
+		<div
+			class="bar-stage interviews-marquee"
+			class:expanded={marqueeHovered}
+			bind:this={barStageEl}
+		></div>
+		<div
+			class="marquee-hover-zone"
+			on:mouseenter={() => (marqueeHovered = true)}
+			on:mouseleave={() => (marqueeHovered = false)}
+		></div>
 	</div>
 {/if}
 
@@ -1149,6 +1164,12 @@
 			var(--mango) 85%,
 			transparent
 		);
+	}
+	.interviews-marquee {
+		--mango: #ffe600;
+	}
+	.interviews-marquee .marquee-text {
+		color: #002107;
 	}
 
 	.page {
