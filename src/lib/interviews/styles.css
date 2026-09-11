@@ -351,6 +351,35 @@ body {
   }
 }
 
+@media (max-width: 899px) {
+  #app :is(
+    a[href],
+    button:not(:disabled),
+    input:not(:disabled),
+    select:not(:disabled),
+    textarea:not(:disabled),
+    label[for],
+    [role='button'],
+    [role='link'],
+    [role='slider'],
+    [tabindex]:not([tabindex='-1']),
+    .slot
+  ),
+  .volume-wheel,
+  .subtitle-languages,
+  .subtitle-languages label {
+    cursor: pointer !important;
+  }
+}
+
+@media (max-width: 899px) and (hover: hover) and (pointer: fine) {
+  .load-btn,
+  .control-buttons .hw-btn,
+  .volume-wheel {
+    cursor: pointer !important;
+  }
+}
+
 .hand-cursor {
   position: fixed;
   pointer-events: none;
